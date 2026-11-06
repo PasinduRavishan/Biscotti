@@ -1128,6 +1128,27 @@ struct HomeViewModelFeaturedStatusTests {
         #expect(status(-2 * 60) == "Happening now")
     }
 
+    @Test("a long meeting still running past the join window is happening now")
+    func statusStillRunning() {
+        // Started 40 minutes ago; the helper's events last 30 minutes, so use a longer one.
+        let longEvent = CalendarEvent(
+            id: "long",
+            title: "T",
+            start: now.addingTimeInterval(-40 * 60),
+            end: now.addingTimeInterval(20 * 60),
+            conferencePlatform: nil,
+            conferenceURL: nil,
+            attendeeCount: 2,
+            calendarTitle: "W",
+            calendarColorHex: "#000000",
+            isMeetingLike: true
+        )
+        #expect(
+            HomeViewModel.featuredStatus(for: longEvent, relativeTo: now, calendar: calendar, locale: locale)
+                == "Happening now"
+        )
+    }
+
     @Test("later today, tomorrow and later this week use day words")
     func statusLaterDays() {
         #expect(status(3 * 3600 + 30 * 60) == "Today at 12:30 PM")

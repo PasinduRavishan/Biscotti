@@ -112,36 +112,39 @@ private struct HomeUpcomingSection: View {
 
     // MARK: Featured card
 
-    /// The card opens the event on tap; its pill buttons sit on top and take
-    /// their own clicks (a Button wrapping Buttons would swallow them).
+    /// The whole card is a button that opens the event (keyboard-focusable,
+    /// like the old hero row); its pill buttons take their own clicks.
     private func featuredCard(event: CalendarEvent) -> some View {
-        FeaturedCard(
-            colorHex: event.calendarColorHex,
-            status: viewModel.featuredStatusText ?? "",
-            title: event.title,
-            detail: featuredDetail(event: event)
-        ) {
-            if viewModel.featuredInJoinWindow {
-                Button {
-                    Task { await viewModel.joinAndRecord(event) }
-                } label: {
-                    Label(
-                        viewModel.heroIsRecordOnly ? "Record" : "Join and record",
-                        systemImage: "record.circle"
-                    )
+        Button {
+            viewModel.selectEvent(event.id)
+        } label: {
+            FeaturedCard(
+                colorHex: event.calendarColorHex,
+                status: viewModel.featuredStatusText ?? "",
+                title: event.title,
+                detail: featuredDetail(event: event)
+            ) {
+                if viewModel.featuredInJoinWindow {
+                    Button {
+                        Task { await viewModel.joinAndRecord(event) }
+                    } label: {
+                        Label(
+                            viewModel.heroIsRecordOnly ? "Record" : "Join and record",
+                            systemImage: "record.circle"
+                        )
+                    }
+                    .buttonStyle(PillButtonStyle(.primaryOnColor))
+                    .disabled(viewModel.recordDisabled)
                 }
-                .buttonStyle(PillButtonStyle(.primaryOnColor))
-                .disabled(viewModel.recordDisabled)
-            }
 
-            Button("View in calendar") {
-                viewModel.openInCalendar(event)
+                Button("View in calendar") {
+                    viewModel.openInCalendar(event)
+                }
+                .buttonStyle(PillButtonStyle(.secondaryOnColor))
             }
-            .buttonStyle(PillButtonStyle(.secondaryOnColor))
+            .contentShape(RoundedRectangle(cornerRadius: Tokens.cardRadius))
         }
-        .contentShape(RoundedRectangle(cornerRadius: Tokens.cardRadius))
-        .onTapGesture { viewModel.selectEvent(event.id) }
-        .accessibilityAddTraits(.isButton)
+        .buttonStyle(.plain)
     }
 
     /// "10:30 – 11:00 AM · Google Meet · Ana, Raj, +3"

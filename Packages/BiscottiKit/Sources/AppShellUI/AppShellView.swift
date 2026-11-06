@@ -463,7 +463,7 @@ private struct RecordingToolbarButton: View {
         } label: {
             HStack(spacing: 6) {
                 Circle()
-                    .fill(Color.signalRed)
+                    .fill(Color.white)
                     .frame(width: 8, height: 8)
                     .opacity(pulsing ? 0.4 : 1.0)
                     .animation(

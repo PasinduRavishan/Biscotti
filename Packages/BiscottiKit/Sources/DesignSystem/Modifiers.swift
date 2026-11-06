@@ -2,13 +2,13 @@ import SwiftUI
 
 // MARK: - Kicker modifier
 
-/// Applies the section-label style: 12pt semibold, secondary color, sentence case.
-/// Usage: `Text("Upcoming").kicker()`
+/// Applies the section-label style: 12pt semibold, sentence case. Color is
+/// left to the call site (most use `.inkSecondary`; status tags use the accent).
+/// Usage: `Text("Upcoming").kicker().foregroundStyle(.inkSecondary)`
 private struct KickerModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .font(.monoKicker)
-            .foregroundStyle(.inkSecondary)
     }
 }
 

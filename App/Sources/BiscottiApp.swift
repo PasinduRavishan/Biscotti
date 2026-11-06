@@ -150,7 +150,6 @@ private struct WindowRootView: View {
             }
         }
         .onAppear {
-            ThemeApplier.apply(ThemeStore().theme)
             let captured = openWindow
             launchState.sceneOpener = {
                 captured(id: "main")
@@ -286,6 +285,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate,
         subsystem: "net.scosman.biscotti",
         category: "startup"
     )
+
+    /// Apply the saved theme before any scene draws, so a login launch with no
+    /// main window (menu-bar only) still gets the chosen appearance.
+    func applicationWillFinishLaunching(_: Notification) {
+        ThemeApplier.apply(ThemeStore().theme)
+    }
 
     func applicationDidFinishLaunching(_: Notification) {
         logger.info("applicationDidFinishLaunching: enter")

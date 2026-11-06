@@ -111,8 +111,10 @@ public final class HomeViewModel {
         locale: Locale = .current
     ) -> String {
         let delta = event.start.timeIntervalSince(now)
-        if abs(delta) <= MeetingTiming.joinWindowSeconds {
-            guard delta > 0 else { return "Happening now" }
+        if delta <= 0, now < event.end || -delta <= MeetingTiming.joinWindowSeconds {
+            return "Happening now"
+        }
+        if delta > 0, delta <= MeetingTiming.joinWindowSeconds {
             return "Starting in \(max(1, Int((delta / 60).rounded(.up)))) min"
         }
         let formatter = DateFormatter()

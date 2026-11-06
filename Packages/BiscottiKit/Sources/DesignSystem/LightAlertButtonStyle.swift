@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// Light alert button style shared by Stop & Save and the recording-state
-/// header button.
+/// Red recording pill shared by Stop & Save and the recording-state header
+/// button.
 ///
-/// Elevated fill `elevatedFill`, `recordingOutline` 0.5pt border, whisper shadow,
-/// `signalRed` content, `recordingHoverFill` on hover. The caller's label
-/// controls layout (padding, height); this style only provides the chrome.
+/// Solid `signalRed` capsule with white content, slightly dimmed on hover.
+/// The caller's label controls layout (padding, height); this style only
+/// provides the chrome. Red is reserved for recording, so only recording
+/// controls use it.
 public struct LightAlertButtonStyle: ButtonStyle {
     @State private var isHovering = false
     @Environment(\.isEnabled) private var isEnabled
@@ -14,15 +15,9 @@ public struct LightAlertButtonStyle: ButtonStyle {
 
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .foregroundStyle(Color.signalRed)
-            .background(
-                RoundedRectangle(cornerRadius: 9)
-                    .fill(isHovering ? Color.recordingHoverFill : Color.elevatedFill)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 9)
-                    .strokeBorder(Color.recordingOutline, lineWidth: 0.5)
-            )
+            .foregroundStyle(.white)
+            .background(Capsule().fill(Color.signalRed.opacity(isHovering ? 0.88 : 1)))
+            .contentShape(Capsule())
             .opacity(
                 !isEnabled ? 0.4 : configuration.isPressed ? 0.7 : 1.0
             )
