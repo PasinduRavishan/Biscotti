@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Shared design tokens: colors, typography, and spacing for the F Sage identity.
+/// Shared design tokens: colors, typography, and spacing for the native,
+/// Games-style identity.
 public enum Tokens {
     // MARK: - Colors
 
@@ -235,8 +236,11 @@ public enum Tokens {
 
     // MARK: - Home Radii
 
-    /// Card corner radius.
-    public static let cardRadius: CGFloat = 12
+    /// Card corner radius (large cards, featured card).
+    public static let cardRadius: CGFloat = 14
+
+    /// Meeting tile corner radius.
+    public static let tileRadius: CGFloat = 10
 
     /// Button / search / chip radius.
     public static let buttonRadius: CGFloat = 8

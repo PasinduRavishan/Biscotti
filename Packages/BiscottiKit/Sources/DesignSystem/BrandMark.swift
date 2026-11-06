@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// The Biscotti brand mark: the shield + mic glyph, tinted sage.
+/// The Biscotti brand mark: the shield + mic glyph, monochrome
+/// (`Color.brandMarkTint`: black in light, white in dark).
 ///
 /// Draws the menu-bar artwork from the app's asset catalog rather than a
 /// second copy of the SVG. That asset lives in the app target, so it resolves
@@ -25,12 +26,12 @@ public struct BrandMark: View {
     }
 
     public var body: some View {
-        // The colour comes from a sage fill cut to the artwork's alpha, not
+        // The colour comes from a tint fill cut to the artwork's alpha, not
         // from template rendering, so it never depends on whether the image
         // source honours template mode or on the SVG's baked-in black fill.
         fittedArtwork
             .frame(height: height)
-            .overlay { Color.sage }
+            .overlay { Color.brandMarkTint }
             .mask { fittedArtwork }
     }
 

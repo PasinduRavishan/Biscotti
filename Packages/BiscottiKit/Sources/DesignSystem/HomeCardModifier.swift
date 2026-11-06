@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Applies the Home card style: white fill, 12pt corner radius, hairline stroke,
-/// and a whisper shadow.
+/// Applies the card style: flat raised fill, `Tokens.cardRadius` corners and a
+/// hairline stroke. No shadow.
 public struct HomeCardModifier: ViewModifier {
     public func body(content: Content) -> some View {
         content
@@ -11,12 +11,11 @@ public struct HomeCardModifier: ViewModifier {
                 RoundedRectangle(cornerRadius: Tokens.cardRadius)
                     .strokeBorder(Tokens.cardStroke, lineWidth: 0.5)
             )
-            .shadow(color: .cardShadow, radius: 1.5, y: 1)
     }
 }
 
 public extension View {
-    /// Wraps the view in a Home-style card (white fill, hairline border, whisper shadow).
+    /// Wraps the view in a flat card (raised fill, hairline border).
     func homeCard() -> some View {
         modifier(HomeCardModifier())
     }

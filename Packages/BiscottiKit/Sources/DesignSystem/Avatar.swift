@@ -35,13 +35,7 @@ public struct Avatar: View {
     public var body: some View {
         ZStack {
             Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [baseColor, baseColor.opacity(0.7)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(baseColor)
 
             // Inset hairline ring
             Circle()

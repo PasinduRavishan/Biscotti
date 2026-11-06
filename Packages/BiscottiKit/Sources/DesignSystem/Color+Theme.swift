@@ -1,119 +1,96 @@
 import AppKit
 import SwiftUI
 
-// MARK: - Semantic color palette (F Sage) — appearance-adaptive
+// MARK: - Semantic color palette — native, neutral, appearance-adaptive
 
-// Every token is defined once via `dynamicNSColor` / `dynamicColor`. Light values
-// are the exact sRGB literals from the original static palette. Dark values come
-// from the approved design (functional_spec.md §3). Views never branch on
-// `colorScheme` — appearance is resolved entirely here.
+// Surfaces are neutral greys (Games-style dark showcase in dark mode, plain
+// native light surfaces in light mode). Text, separators and the accent come
+// straight from AppKit's semantic system colors, which already resolve per
+// appearance and follow the user's macOS accent setting. Fixed surface values
+// use `dynamicColor`. Views never branch on `colorScheme`.
+//
+// TODO: rename sage/paper/ink tokens to accent/background/label once the
+// redesign settles; the names are legacy from the previous identity.
 
 // MARK: - NSColor tokens (single source of truth)
 
 // Tokens that have AppKit consumers (markdown editor, etc.) are defined as
 // `NSColor` first; the `Color` extension derives from them via `Color(nsColor:)`.
-// Tokens used only in SwiftUI are defined directly via `dynamicColor`.
 
 public extension NSColor {
-    /// Primary text — warm near-black (#1A1813) / warm off-white (#F7F2E8).
-    static let ink = dynamicNSColor(
-        light: NSColor(srgbRed: 0.102, green: 0.094, blue: 0.075, alpha: 1),
-        dark: NSColor(srgbRed: 0.969, green: 0.949, blue: 0.910, alpha: 1)
-    )
+    /// Primary text — the system label color.
+    static let ink = NSColor.labelColor
 
-    /// Secondary text: ink @ 54% / #F7F2E8 @ 58%.
-    static let inkSecondary = dynamicNSColor(
-        light: NSColor(srgbRed: 0.102, green: 0.094, blue: 0.075, alpha: 0.54),
-        dark: NSColor(srgbRed: 0.969, green: 0.949, blue: 0.910, alpha: 0.58)
-    )
+    /// Secondary text — the system secondary label color.
+    static let inkSecondary = NSColor.secondaryLabelColor
 
-    /// Tertiary text / chevrons: ink @ 34% / #F7F2E8 @ 36%.
-    static let inkTertiary = dynamicNSColor(
-        light: NSColor(srgbRed: 0.102, green: 0.094, blue: 0.075, alpha: 0.34),
-        dark: NSColor(srgbRed: 0.969, green: 0.949, blue: 0.910, alpha: 0.36)
-    )
+    /// Tertiary text / chevrons — the system tertiary label color.
+    static let inkTertiary = NSColor.tertiaryLabelColor
 
-    /// Brand accent — sage green (#4E7D5C / #86C295).
-    static let sage = dynamicNSColor(
-        light: NSColor(srgbRed: 0.306, green: 0.490, blue: 0.361, alpha: 1),
-        dark: NSColor(srgbRed: 0.525, green: 0.761, blue: 0.584, alpha: 1)
-    )
+    /// Accent — the user's macOS accent color (legacy name).
+    static let sage = NSColor.controlAccentColor
 
-    /// Selection background: sage @ 14% / #86C295 @ 16%.
-    static let accentWashStrong = dynamicNSColor(
-        light: NSColor(srgbRed: 0.306, green: 0.490, blue: 0.361, alpha: 0.14),
-        dark: NSColor(srgbRed: 0.525, green: 0.761, blue: 0.584, alpha: 0.16)
-    )
+    /// Selection background: accent @ 18%.
+    static let accentWashStrong = dynamicNSColor(.controlAccentColor, alpha: 0.18)
 
-    /// Focused find-match highlight: sage @ 35% / #86C295 @ 35%.
-    static let findHighlightFocused = dynamicNSColor(
-        light: NSColor(srgbRed: 0.306, green: 0.490, blue: 0.361, alpha: 0.35),
-        dark: NSColor(srgbRed: 0.525, green: 0.761, blue: 0.584, alpha: 0.35)
-    )
+    /// Focused find-match highlight: accent @ 35%.
+    static let findHighlightFocused = dynamicNSColor(.controlAccentColor, alpha: 0.35)
 
-    /// Card border (0.5pt): warm dark @ 10% / #F7F2E8 @ 12%.
-    static let cardStroke = dynamicNSColor(
-        light: NSColor(srgbRed: 0.102, green: 0.086, blue: 0.055, alpha: 0.10),
-        dark: NSColor(srgbRed: 0.969, green: 0.949, blue: 0.910, alpha: 0.12)
-    )
+    /// Card border (0.5pt) — the system separator color.
+    static let cardStroke = NSColor.separatorColor
 }
+
+/// #1C1C1E — dark content background.
+private let darkBase = NSColor(srgbRed: 28 / 255, green: 28 / 255, blue: 30 / 255, alpha: 1)
+/// #2C2C2E — dark raised surface (cards, sidebar).
+private let darkRaised = NSColor(srgbRed: 44 / 255, green: 44 / 255, blue: 46 / 255, alpha: 1)
+/// #F5F5F7 — light raised surface (cards, list pane).
+private let lightRaised = NSColor(srgbRed: 245 / 255, green: 245 / 255, blue: 247 / 255, alpha: 1)
+/// #F2F2F4 — light sidebar.
+private let lightSidebar = NSColor(srgbRed: 242 / 255, green: 242 / 255, blue: 244 / 255, alpha: 1)
 
 // MARK: - Color tokens (SwiftUI)
 
 public extension Color {
-    /// Warm ivory content background (#FBFAF5 / #100E09).
-    static let paper = dynamicColor(
-        light: NSColor(srgbRed: 0.984, green: 0.980, blue: 0.961, alpha: 1),
-        dark: NSColor(srgbRed: 0.063, green: 0.055, blue: 0.035, alpha: 1)
-    )
+    /// Content background: white / #1C1C1E.
+    static let paper = dynamicColor(light: .white, dark: darkBase)
 
-    /// Primary text — warm near-black / warm off-white.
+    /// Primary text.
     static let ink = Color(nsColor: .ink)
 
-    /// Brand accent — sage green.
+    /// Accent — the user's macOS accent color (legacy name).
     static let sage = Color(nsColor: .sage)
 
-    /// Secondary text: ink @ 54% / warm off-white @ 58%.
+    /// Secondary text.
     static let inkSecondary = Color(nsColor: .inkSecondary)
 
-    /// Tertiary text / chevrons: ink @ 34% / warm off-white @ 36%.
+    /// Tertiary text / chevrons.
     static let inkTertiary = Color(nsColor: .inkTertiary)
 
-    /// Separator: ink @ 11% / #F7F2E8 @ 12%.
-    static let hairline = dynamicColor(
-        light: NSColor(srgbRed: 0.102, green: 0.094, blue: 0.075, alpha: 0.11),
-        dark: NSColor(srgbRed: 0.969, green: 0.949, blue: 0.910, alpha: 0.12)
-    )
+    /// Separator.
+    static let hairline = Color(nsColor: .separatorColor)
 
-    /// Neutral chip fill: ink @ 6% / #F7F2E8 @ 7%.
+    /// Neutral chip fill: black @ 6% / white @ 10%.
     static let neutralChip = dynamicColor(
-        light: NSColor(srgbRed: 0.102, green: 0.094, blue: 0.075, alpha: 0.06),
-        dark: NSColor(srgbRed: 0.969, green: 0.949, blue: 0.910, alpha: 0.07)
+        light: NSColor(srgbRed: 0, green: 0, blue: 0, alpha: 0.06),
+        dark: NSColor(srgbRed: 1, green: 1, blue: 1, alpha: 0.10)
     )
 
     /// Card border (0.5pt).
     static let cardStroke = Color(nsColor: .cardStroke)
 
-    /// Selection background: sage @ 14% / #86C295 @ 16%.
+    /// Selection background: accent @ 18%.
     static let accentWashStrong = Color(nsColor: .accentWashStrong)
 
-    /// Focused find-match highlight: sage @ 35% / #86C295 @ 35%.
+    /// Focused find-match highlight: accent @ 35%.
     static let findHighlightFocused = Color(nsColor: .findHighlightFocused)
 
-    /// Hero tint / speaker chip: sage @ 8% / #86C295 @ 12%.
-    static let accentWashSoft = dynamicColor(
-        light: NSColor(srgbRed: 0.306, green: 0.490, blue: 0.361, alpha: 0.08),
-        dark: NSColor(srgbRed: 0.525, green: 0.761, blue: 0.584, alpha: 0.12)
-    )
+    /// Soft accent tint (speaker chips): accent @ 10%.
+    static let accentWashSoft = Color(nsColor: dynamicNSColor(.controlAccentColor, alpha: 0.10))
 
-    /// **The single canonical red for the entire app** (#B23320 / #E5604A).
+    /// **The single canonical red for the entire app** — system red.
     ///
-    /// A warm red chosen to complement sage. In dark mode, brightens to maintain
-    /// contrast. Use this token for **marks**: dots, icons, stop-square, fills,
-    /// borders. For standalone red **text** labels on dark, use `signalRedText`
-    /// instead (lighter for AA legibility).
-    ///
-    /// Do **not** introduce other reds or use raw `Color.red` / `.systemRed`.
+    /// Use for **marks**: dots, icons, stop-square, fills, borders.
     ///
     /// **Approved usages:**
     /// - **Error / failure states:** error icons, error-tinted backgrounds
@@ -121,143 +98,78 @@ public extension Color {
     /// - **Recording indicators:** the pulsing recording dot, Stop button fill.
     /// - **Destructive actions & buttons:** destructive icons and filled
     ///   destructive buttons (pair with white label).
-    static let signalRed = dynamicColor(
-        light: NSColor(srgbRed: 0.698, green: 0.200, blue: 0.125, alpha: 1),
-        dark: NSColor(srgbRed: 0.898, green: 0.376, blue: 0.290, alpha: 1)
-    )
+    static let signalRed = Color(nsColor: .systemRed)
 
-    /// **The single canonical warning color** (#C6891E / #E8A13A).
-    ///
-    /// A warm ochre for warning **icons** (triangles) and the pulsing warning
-    /// **dot**. In dark mode, brightens to maintain contrast. For amber **text**
-    /// labels, use `warningChipText` (lighter in dark for legibility).
-    ///
-    /// Do **not** introduce other yellows/oranges for warnings.
-    static let warningOchre = dynamicColor(
-        light: NSColor(srgbRed: 0.776, green: 0.537, blue: 0.118, alpha: 1),
-        dark: NSColor(srgbRed: 0.910, green: 0.631, blue: 0.227, alpha: 1)
-    )
+    /// **The single canonical warning color** — system orange.
+    static let warningOchre = Color(nsColor: .systemOrange)
 
-    /// Window wall: flat warm-grey fallback (#E4E1D8 / #110F09).
-    static let wall = dynamicColor(
-        light: NSColor(srgbRed: 0.894, green: 0.882, blue: 0.847, alpha: 1),
-        dark: NSColor(srgbRed: 0.067, green: 0.059, blue: 0.035, alpha: 1)
-    )
+    /// Window wall: #F2F2F4 / #2C2C2E.
+    static let wall = dynamicColor(light: lightSidebar, dark: darkRaised)
 
-    /// Sidebar tint: translucent ivory / dark overlay.
-    static let sidebarTint = dynamicColor(
-        light: NSColor(srgbRed: 0.980, green: 0.976, blue: 0.957, alpha: 0.82),
-        dark: NSColor(srgbRed: 0.078, green: 0.071, blue: 0.051, alpha: 0.74)
-    )
+    /// Sidebar tint: #F2F2F4 / #2C2C2E.
+    static let sidebarTint = dynamicColor(light: lightSidebar, dark: darkRaised)
 
-    // MARK: - Recording redesign tokens
+    // MARK: - Recording tokens
 
-    /// Sidebar RECORDING NOW row fill; auto-stop card wash: signalRed @ 8%.
-    /// Auto-adapts via the dynamic `signalRed` base.
+    /// Sidebar "Recording now" row fill; auto-stop card wash: signalRed @ 8%.
     static let recordingTintSoft = signalRed.opacity(0.08)
 
     /// Selected sidebar recording row fill: signalRed @ 12%.
     static let recordingTintStrong = signalRed.opacity(0.12)
 
-    /// Light Stop/REC button hairline: signalRed @ 32% / #E5604A @ 36%.
-    static let recordingOutline = dynamicColor(
-        light: NSColor(srgbRed: 0.698, green: 0.200, blue: 0.125, alpha: 0.32),
-        dark: NSColor(srgbRed: 0.898, green: 0.376, blue: 0.290, alpha: 0.36)
-    )
+    /// Stop/REC button hairline: system red @ 32%.
+    static let recordingOutline = Color(nsColor: dynamicNSColor(.systemRed, alpha: 0.32))
 
     /// Selected recording row inset stroke: signalRed @ 20%.
     static let recordingOutlineStrong = signalRed.opacity(0.20)
 
-    /// Light Stop/REC button hover: signalRed @ 5%.
+    /// Stop/REC button hover: signalRed @ 5%.
     static let recordingHoverFill = signalRed.opacity(0.05)
 
-    /// Left chip amber kicker + value text (#C6891E / #F0C04A).
-    /// Separate from `warningOchre` in dark (brighter for text legibility).
-    static let warningChipText = dynamicColor(
-        light: NSColor(srgbRed: 0.776, green: 0.537, blue: 0.118, alpha: 1),
-        dark: NSColor(srgbRed: 0.941, green: 0.753, blue: 0.290, alpha: 1)
-    )
+    /// Amber chip text — system orange.
+    static let warningChipText = Color(nsColor: .systemOrange)
 
-    /// "Add note" + "Keep Recording" button fill: sage @ 12% / #86C295 @ 14%.
-    static let softSageFill = dynamicColor(
-        light: NSColor(srgbRed: 0.306, green: 0.490, blue: 0.361, alpha: 0.12),
-        dark: NSColor(srgbRed: 0.525, green: 0.761, blue: 0.584, alpha: 0.14)
-    )
+    /// "Add note" + "Keep Recording" button fill: accent @ 14% (legacy name).
+    static let softSageFill = Color(nsColor: dynamicNSColor(.controlAccentColor, alpha: 0.14))
 
-    // MARK: - New semantic tokens (Phase 1)
+    // MARK: - Surfaces
 
-    /// Card fill (#FFFFFF / #1A170F). All card surfaces adapt via this token.
-    static let cardFill = dynamicColor(
-        light: NSColor(srgbRed: 1.0, green: 1.0, blue: 1.0, alpha: 1),
-        dark: NSColor(srgbRed: 0.102, green: 0.090, blue: 0.059, alpha: 1)
-    )
+    /// Card fill: #F5F5F7 / #2C2C2E. All card surfaces adapt via this token.
+    static let cardFill = dynamicColor(light: lightRaised, dark: darkRaised)
 
-    /// Button fills — deeper sage for white-label contrast (#4E7D5C / #56906A).
-    /// Light value equals `sage`; dark is a touch deeper so white labels pass AA.
-    static let accentFill = dynamicColor(
-        light: NSColor(srgbRed: 0.306, green: 0.490, blue: 0.361, alpha: 1),
-        dark: NSColor(srgbRed: 0.337, green: 0.565, blue: 0.416, alpha: 1)
-    )
+    /// Button fills — the system accent.
+    static let accentFill = Color(nsColor: .controlAccentColor)
 
-    /// Long-form body text (transcripts): ink @ 54% / #F7F2E8 @ 75%.
-    /// Brighter than `inkSecondary` in dark for comfortable sustained reading.
-    static let read = dynamicColor(
-        light: NSColor(srgbRed: 0.102, green: 0.094, blue: 0.075, alpha: 0.54),
-        dark: NSColor(srgbRed: 0.969, green: 0.949, blue: 0.910, alpha: 0.75)
-    )
+    /// Long-form body text (transcripts) — the system label color.
+    static let read = Color(nsColor: .labelColor)
 
-    /// Elevated control fill — white buttons/fields (#FFFFFF / #1A170F).
-    /// Light = white; dark = card surface (Stop&Save, REC pill, focused title).
-    static let elevatedFill = dynamicColor(
-        light: NSColor(srgbRed: 1.0, green: 1.0, blue: 1.0, alpha: 1),
-        dark: NSColor(srgbRed: 0.102, green: 0.090, blue: 0.059, alpha: 1)
-    )
+    /// Elevated control fill: #F5F5F7 / #2C2C2E.
+    static let elevatedFill = dynamicColor(light: lightRaised, dark: darkRaised)
 
-    /// Custom progress-bar fills (#4E7D5C / #5E9A6F).
-    /// Light = sage; dark = a touch less bright than text sage.
-    static let accentTrack = dynamicColor(
-        light: NSColor(srgbRed: 0.306, green: 0.490, blue: 0.361, alpha: 1),
-        dark: NSColor(srgbRed: 0.369, green: 0.604, blue: 0.435, alpha: 1)
-    )
+    /// Progress-bar fills — the system accent.
+    static let accentTrack = Color(nsColor: .controlAccentColor)
 
-    /// Standalone red text labels (#B23320 / #F08A78).
-    /// Lighter than `signalRed` in dark for AA legibility on dark backgrounds.
-    /// Use for "RECORDING" labels, error messages, "Remove association" text.
-    static let signalRedText = dynamicColor(
-        light: NSColor(srgbRed: 0.698, green: 0.200, blue: 0.125, alpha: 1),
-        dark: NSColor(srgbRed: 0.941, green: 0.541, blue: 0.471, alpha: 1)
-    )
+    /// Standalone red text labels — system red (already adapts for dark).
+    static let signalRedText = Color(nsColor: .systemRed)
 
-    /// Home card shadow: black @ 5% / black @ 40%.
-    static let cardShadow = dynamicColor(
-        light: NSColor(srgbRed: 0, green: 0, blue: 0, alpha: 0.05),
-        dark: NSColor(srgbRed: 0, green: 0, blue: 0, alpha: 0.40)
-    )
+    /// Card shadow — none. Flat surfaces only.
+    static let cardShadow = Color.clear
 
-    /// Control shadow (light-alert buttons): black @ 6% / black @ 40%.
-    static let controlShadow = dynamicColor(
-        light: NSColor(srgbRed: 0, green: 0, blue: 0, alpha: 0.06),
-        dark: NSColor(srgbRed: 0, green: 0, blue: 0, alpha: 0.40)
-    )
+    /// Control shadow — none. Flat surfaces only.
+    static let controlShadow = Color.clear
 
-    /// Avatar stacked-ring border (#FFFFFF / #1A170F).
-    /// Matches the surface behind overlapping avatars so the ring cuts a
-    /// visual gap between circles. Dark value = cardFill-dark.
-    static let avatarRing = dynamicColor(
-        light: NSColor(srgbRed: 1.0, green: 1.0, blue: 1.0, alpha: 1),
-        dark: NSColor(srgbRed: 0.102, green: 0.090, blue: 0.059, alpha: 1)
-    )
+    /// Avatar stacked-ring border: matches `cardFill` so the ring cuts a gap
+    /// between overlapping circles.
+    static let avatarRing = dynamicColor(light: lightRaised, dark: darkRaised)
+
+    /// Brand mark tint: opaque black / white. Opaque (unlike `labelColor`) so
+    /// the mark isn't faded by the mask.
+    static let brandMarkTint = dynamicColor(light: .black, dark: .white)
 
     // MARK: - List pane
 
-    /// List pane background — a distinct **third** warm ivory, between `paper`
-    /// (main content) and `sidebarTint` (sidebar). Used for the meetings list.
-    /// Light `#F7F3EB` / dark **provisional** `#17140D`.
-    /// provisional dark — eyeball in Phase 5
-    static let listPaneBackground = dynamicColor(
-        light: NSColor(srgbRed: 0.969, green: 0.953, blue: 0.922, alpha: 1),
-        dark: NSColor(srgbRed: 0.090, green: 0.078, blue: 0.051, alpha: 1)
-    )
+    /// List pane background (meetings list): #F5F5F7 / #1C1C1E.
+    static let listPaneBackground = dynamicColor(light: lightRaised, dark: darkBase)
 
     // MARK: - On solid-accent (selected) surface tokens
 

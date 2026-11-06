@@ -7,25 +7,30 @@ import Testing
 @Suite("BrandMark")
 struct BrandMarkTests {
     /// Renders the mark over a stand-in for the SVG (opaque black left half,
-    /// transparent right half) and compares it with a plain `Color.sage`
-    /// swatch from the same renderer, so colour space and light/dark
-    /// resolution are identical on both sides of the comparison.
-    @Test("Artwork renders in opaque sage, whatever its own fill or rendering intent", arguments: ArtworkSource.allCases)
+    /// transparent right half) and compares it with a plain
+    /// `Color.brandMarkTint` swatch from the same renderer, so colour space
+    /// and light/dark resolution are identical on both sides of the
+    /// comparison. Rendered dark, where the tint is white, so it can't be
+    /// confused with the artwork's own black fill.
+    @Test("Artwork renders in the opaque tint, whatever its own fill or rendering intent", arguments: ArtworkSource.allCases)
     @MainActor
-    func artworkRendersInSage(source: ArtworkSource) throws {
+    func artworkRendersInTint(source: ArtworkSource) throws {
         let side = 20
         let artwork = try source.image(side: side)
-        let mark = try render(BrandMark(artwork: artwork, height: CGFloat(side)), side: side)
-        let swatch = try render(Color.sage, side: side)
+        let mark = try render(
+            BrandMark(artwork: artwork, height: CGFloat(side)).environment(\.colorScheme, .dark),
+            side: side
+        )
+        let swatch = try render(Color.brandMarkTint.environment(\.colorScheme, .dark), side: side)
 
         let painted = try pixel(in: mark, atWidthFraction: 0.25, heightFraction: 0.5)
         let unpainted = try pixel(in: mark, atWidthFraction: 0.75, heightFraction: 0.5)
-        let sage = try pixel(in: swatch, atWidthFraction: 0.25, heightFraction: 0.5)
+        let tint = try pixel(in: swatch, atWidthFraction: 0.25, heightFraction: 0.5)
 
         // The values sit in the expanded expressions (not just the comments)
         // so they survive `make test`'s one-line-per-issue output filter.
-        #expect(sage.isOpaqueGreen, "Reference swatch should be opaque sage, got \(sage)")
-        #expect(painted.isClose(to: sage), "Opaque artwork pixel \(painted) should match sage \(sage)")
+        #expect(tint.isOpaqueWhite, "Reference swatch should be opaque white in dark, got \(tint)")
+        #expect(painted.isClose(to: tint), "Opaque artwork pixel \(painted) should match tint \(tint)")
         #expect(unpainted.isTransparent, "Transparent artwork pixel should stay transparent, got \(unpainted)")
     }
 
@@ -115,16 +120,15 @@ private struct RGBA8: CustomStringConvertible {
         alpha <= 2
     }
 
-    /// True for either sage variant (light #4E7D5C, dark #86C295) and false
-    /// for a blank or black render.
-    var isOpaqueGreen: Bool {
-        alpha >= 253 && green > red && green > blue
+    /// True for the dark-mode tint (white) and false for a blank or black render.
+    var isOpaqueWhite: Bool {
+        alpha >= 253 && red >= 245 && green >= 245 && blue >= 245
     }
 
     /// Channel-wise match. The slack absorbs rounding through the mask's
-    /// offscreen pass; real failures are far larger (black is >= 78 levels
-    /// off in every colour channel, the other sage variant >= 56, a mark
-    /// faded to label-colour opacity ~38 in alpha).
+    /// offscreen pass; real failures are far larger (black is 255 levels off
+    /// white in every colour channel, a mark faded to label-colour opacity
+    /// ~38 in alpha).
     func isClose(to other: RGBA8, tolerance: Int = 6) -> Bool {
         [red - other.red, green - other.green, blue - other.blue, alpha - other.alpha]
             .allSatisfy { abs($0) <= tolerance }
