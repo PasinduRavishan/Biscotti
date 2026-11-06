@@ -5,7 +5,7 @@ import SwiftUI
 /// pane and the recording pane.
 ///
 /// Behavior: click to edit, select all on focus, commit on Return or
-/// click-away, tail-truncation when not editing, sage focus ring while
+/// click-away, tail-truncation when not editing, accent focus ring while
 /// editing. The control owns its focus state and click-away monitor.
 public struct EditableMeetingTitle: View {
     @Binding private var text: String
@@ -104,7 +104,7 @@ public struct EditableMeetingTitle: View {
                 }
             }
         }
-        // Focused styling: white fill + sage outline that bleeds
+        // Focused styling: raised fill + accent outline that bleeds
         // outward so the text position and sibling layout stay
         // fixed. Transparent when not focused -> no visible box.
         .padding(.top, 7)

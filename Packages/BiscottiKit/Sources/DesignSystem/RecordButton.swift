@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A prominent Record button styled with a sage circle indicator (idle = sage).
+/// A prominent Record button styled with an accent circle indicator (idle = accent).
 ///
 /// Used in the sidebar as the primary recording action.
 public struct RecordButton: View {

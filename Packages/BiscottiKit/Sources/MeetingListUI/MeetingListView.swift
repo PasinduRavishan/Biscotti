@@ -261,7 +261,7 @@ public struct MeetingListView: View {
 /// `selectionHighlightStyle = .none`, suppressing the system-accent
 /// selection highlight entirely.  The selection *model* (keyboard nav,
 /// arrow keys, multi-select) is unaffected — only the visual drawing
-/// is suppressed, letting `MeetingListView` paint its own solid sage
+/// is suppressed, letting `MeetingListView` paint its own solid accent
 /// fill via `.listRowBackground`.
 ///
 /// The suppression fires on three complementary triggers so it survives

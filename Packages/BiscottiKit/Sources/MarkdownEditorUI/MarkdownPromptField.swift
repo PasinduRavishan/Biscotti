@@ -61,7 +61,7 @@ public struct MarkdownPromptField: View {
 public extension MarkdownEditorConfiguration {
     /// Biscotti theme configured for a bounded prompt field.
     ///
-    /// Same F Sage palette as `.biscotti()` but uses `.scrolls` height
+    /// Same palette as `.biscotti()` but uses `.scrolls` height
     /// behavior so the editor scrolls internally within a fixed frame,
     /// and shows a vertical scroller.
     static func biscottiPromptField() -> MarkdownEditorConfiguration {

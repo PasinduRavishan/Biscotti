@@ -185,12 +185,12 @@ public extension Color {
     static let onAccentChipFill: Color = .white.opacity(0.18)
 
     /// Tag dot ring on a solid-accent surface — white @ 50%.
-    /// A 0.5px ring around coloured dots so slate/teal/olive stay legible on sage.
+    /// A 0.5px ring around coloured dots so slate/teal/olive stay legible on the accent.
     static let onAccentChipRing: Color = .white.opacity(0.5)
 
     // MARK: - Tag-dot palette (8 swatches)
 
-    /// Fixed, ordered palette of 8 adaptive tag-dot colours. Sage is
+    /// Fixed, ordered palette of 8 adaptive tag-dot colours. The accent is
     /// reserved and absent. Assigned round-robin by creation order; stored
     /// as a stable `colorSlot` on each tag. Dark values are starting
     /// proposals -- a human eyeballs them on hardware (Phase 4).

@@ -5,9 +5,9 @@ import MarkdownEngine
 // MARK: - Shared Biscotti theme
 
 public extension MarkdownEditorTheme {
-    /// The F Sage color palette shared by all Biscotti editor configurations.
+    /// The color palette shared by all Biscotti editor configurations.
     ///
-    /// Ink body text, sage links, dimmed-ink markers.
+    /// Ink body text, accent links, dimmed-ink markers.
     static let biscotti = MarkdownEditorTheme(
         bodyText: .ink,
         mutedText: .inkSecondary,
@@ -24,7 +24,7 @@ public extension MarkdownEditorTheme {
 // MARK: - Biscotti configuration factory
 
 public extension MarkdownEditorConfiguration {
-    /// Builds a `MarkdownEditorConfiguration` themed to the F Sage identity.
+    /// Builds a `MarkdownEditorConfiguration` themed to the Biscotti identity.
     ///
     /// Maps Biscotti design tokens onto the engine's knobs:
     /// - Ink body text, sage links, dimmed-ink markers.

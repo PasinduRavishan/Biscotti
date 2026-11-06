@@ -4,8 +4,8 @@ import SwiftUI
 /// Ghost pill that opens the tag picker popover. Three visual states:
 ///
 /// - **Has tags**: dashed neutral border, "+ Add tag" label.
-/// - **Empty** (0 tags): dashed sage border, "Add tags" label with tag glyph.
-/// - **Picker open**: solid sage border, active sage fill.
+/// - **Empty** (0 tags): dashed accent border, "Add tags" label with tag glyph.
+/// - **Picker open**: solid accent border, active accent fill.
 struct TagAddButton: View {
     let hasTags: Bool
     let isPickerOpen: Bool

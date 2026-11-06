@@ -103,7 +103,7 @@ public struct ConnectCalendarSheet: View {
 
 // MARK: - More Info Link
 
-/// A sage "More info >" link button. Shared between the quiet hint and
+/// An accent "More info >" link button. Shared between the quiet hint and
 /// empty-state views to open the ConnectCalendarSheet.
 public struct MoreInfoLink: View {
     private let action: () -> Void

@@ -5,7 +5,7 @@ import SwiftUI
 /// A Biscotti-themed live markdown editor.
 ///
 /// Wraps the third-party `NativeTextViewWrapper` from `MarkdownEngine`
-/// with the F Sage color palette, dimmed markers (hide-on-blur), and
+/// with the Biscotti color palette, dimmed markers (hide-on-blur), and
 /// prose-friendly defaults. Uses `.fitsContent` height behavior so the
 /// editor grows to fit its content instead of scrolling internally --
 /// the enclosing page scroll view handles overflow.

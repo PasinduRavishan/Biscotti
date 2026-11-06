@@ -129,7 +129,7 @@ extension ModelDownloadRow where ExtraContent == EmptyView {
 
 // MARK: - IndeterminateBar
 
-/// A sage capsule segment that bounces back and forth within a hairline track.
+/// An accent capsule segment that bounces back and forth within a hairline track.
 /// Falls back to a static left-parked segment when Reduce Motion is on.
 private struct IndeterminateBar: View {
     let trackWidth: CGFloat
@@ -256,7 +256,7 @@ struct DownloadControl: View {
         }
     }
 
-    /// Determinate sage capsule bar; fill proportional to fraction.
+    /// Determinate accent capsule bar; fill proportional to fraction.
     private func determinateBar(fraction: Double) -> some View {
         ZStack(alignment: .leading) {
             Capsule()

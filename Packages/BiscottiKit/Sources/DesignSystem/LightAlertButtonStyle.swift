@@ -23,9 +23,6 @@ public struct LightAlertButtonStyle: ButtonStyle {
                 RoundedRectangle(cornerRadius: 9)
                     .strokeBorder(Color.recordingOutline, lineWidth: 0.5)
             )
-            // Tighter whisper shadow than HomeCardModifier (0.05/1.5/1)
-            // -- intentional for the smaller button footprint.
-            .shadow(color: .controlShadow, radius: 1, x: 0, y: 0.5)
             .opacity(
                 !isEnabled ? 0.4 : configuration.isPressed ? 0.7 : 1.0
             )

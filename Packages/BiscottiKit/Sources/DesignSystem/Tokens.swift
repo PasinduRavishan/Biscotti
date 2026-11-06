@@ -18,7 +18,7 @@ public enum Tokens {
     /// Background for banners (error).
     public static let errorBackground = Color.signalRed.opacity(0.15)
 
-    /// Speaker chip background (sage wash).
+    /// Speaker chip background (accent wash).
     public static let speakerChipBackground = Color.accentWashSoft
 
     // MARK: - Surfaces (warm ivory)
@@ -72,7 +72,7 @@ public enum Tokens {
     /// "Add note" + "Keep Recording" button fill.
     public static let softSageFill = Color.softSageFill
 
-    /// Button fills -- deeper sage for white-label contrast in dark.
+    /// Button fills -- the system accent.
     public static let accentFill = Color.accentFill
 
     /// Elevated control fill (white buttons/fields in light, card surface in dark).
@@ -96,7 +96,7 @@ public enum Tokens {
     /// Avatar stacked-ring border (matches surface behind overlapping avatars).
     public static let avatarRing = Color.avatarRing
 
-    /// Sage accent -- formerly "liveGreen". Meet chip icon, "Next in" dot, conference video icon.
+    /// Accent -- formerly "liveGreen". Meet chip icon, "Next in" dot, conference video icon.
     public static let liveGreen = Color.sage
 
     /// Fixed 16-color avatar palette. Order is permanent; never reorder.
