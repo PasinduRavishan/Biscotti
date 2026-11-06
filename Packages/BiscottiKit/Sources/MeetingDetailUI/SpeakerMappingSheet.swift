@@ -292,7 +292,7 @@ private struct PersonPickerPopover: View {
     @ViewBuilder
     private var inviteesSection: some View {
         if !pickerResult.invitees.isEmpty {
-            pickerSectionHeader("INVITEES")
+            pickerSectionHeader("Invitees")
             ForEach(pickerResult.invitees) { person in
                 personRow(person)
             }
@@ -302,7 +302,7 @@ private struct PersonPickerPopover: View {
     @ViewBuilder
     private var allPeopleSection: some View {
         if !pickerResult.allPeople.isEmpty {
-            pickerSectionHeader("ALL PEOPLE")
+            pickerSectionHeader("All people")
             ForEach(pickerResult.allPeople) { person in
                 personRow(person)
             }

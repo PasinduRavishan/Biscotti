@@ -177,7 +177,7 @@ private struct NoteRowView: View {
                 RecordingViewModel
                     .formatNoteTimestamp(note.timestamp)
             )
-            .font(.biscottiMono(11.5))
+            .font(.system(size: 11.5).monospacedDigit())
             .foregroundStyle(Color.sage)
             .frame(width: 46, alignment: .leading)
 

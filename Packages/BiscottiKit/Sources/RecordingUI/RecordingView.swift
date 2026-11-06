@@ -211,9 +211,8 @@ public struct RecordingView: View {
             }
             .onAppear { rippleActive = true }
 
-            Text("RECORDING")
-                .font(.biscottiMono(12.5, weight: .medium))
-                .tracking(1.5)
+            Text("Recording")
+                .font(.system(size: 12.5, weight: .medium).monospacedDigit())
                 .foregroundStyle(Color.signalRedText)
         }
     }
@@ -262,7 +261,7 @@ public struct RecordingView: View {
             EditableMeetingTitle(
                 text: $viewModel.editableTitle,
                 placeholder: "Untitled recording",
-                font: .biscottiSerif(26)
+                font: .pageTitle
             ) {
                 await viewModel.saveTitle()
             }

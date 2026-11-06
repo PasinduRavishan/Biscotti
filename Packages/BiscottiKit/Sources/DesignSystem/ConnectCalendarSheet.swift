@@ -85,7 +85,7 @@ public struct ConnectCalendarSheet: View {
             // Wrapping text + inline chip
             Text("In the menu bar, choose ")
                 + Text("Calendar \u{25B8} Add Account\u{2026}")
-                .font(.biscottiMono(12))
+                .font(.system(size: 12).monospacedDigit())
                 + Text(".")
         }
     }

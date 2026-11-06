@@ -87,7 +87,7 @@ private struct HomeUpcomingSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HomeSharedViews.groupLabel("UPCOMING")
+            HomeSharedViews.groupLabel("Upcoming")
                 .padding(.bottom, Tokens.groupToCardGap)
 
             if viewModel.showConnectCalendar {
@@ -307,7 +307,7 @@ private struct HomePastSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HomeSharedViews.groupLabel("PAST MEETINGS")
+            HomeSharedViews.groupLabel("Past meetings")
                 .padding(.bottom, Tokens.groupToCardGap)
 
             if viewModel.showNoRecent {
@@ -419,8 +419,6 @@ private enum HomeSharedViews {
     static func groupLabel(_ title: String) -> some View {
         Text(title)
             .font(.monoKicker)
-            .textCase(.uppercase)
-            .tracking(1.47)
             .foregroundStyle(.inkSecondary)
             .padding(.leading, 4)
     }

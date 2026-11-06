@@ -216,13 +216,13 @@ public struct EditableMeetingTitle: View {
                 EditableMeetingTitle(
                     text: $title,
                     placeholder: "Untitled meeting",
-                    font: .biscottiSerif(27)
+                    font: .pageTitle
                 ) {}
 
                 EditableMeetingTitle(
                     text: .constant(""),
                     placeholder: "Untitled recording",
-                    font: .biscottiSerif(26)
+                    font: .pageTitle
                 ) {}
             }
             .padding()

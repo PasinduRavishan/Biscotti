@@ -81,7 +81,7 @@ public struct SummaryPromptSheet: View {
                 .foregroundStyle(.sage)
 
             Text(titleText)
-                .font(.biscottiSerif(27))
+                .font(.pageTitle)
                 .tracking(-0.27)
                 .foregroundStyle(.ink)
 
@@ -99,8 +99,8 @@ public struct SummaryPromptSheet: View {
 
     private var kickerText: String {
         switch model.mode {
-        case .global: "MEETING SUMMARY"
-        case .perMeeting: "RE-SUMMARIZE"
+        case .global: "Meeting summary"
+        case .perMeeting: "Re-summarize"
         }
     }
 
@@ -163,7 +163,7 @@ public struct SummaryPromptSheet: View {
     // MARK: - Section chips
 
     private var sectionLabel: some View {
-        Text("ADD SECTION")
+        Text("Add section")
             .kicker()
             .foregroundStyle(.inkTertiary)
     }

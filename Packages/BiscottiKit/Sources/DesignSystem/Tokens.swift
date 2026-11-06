@@ -121,7 +121,7 @@ public enum Tokens {
 
     // MARK: - Typography
 
-    /// Recording elapsed counter: JetBrains Mono largeTitle, weight 500.
+    /// Recording elapsed counter: 34pt medium, aligned digits.
     public static let elapsedTimeFont = Font.monoElapsed
 
     /// Title font for meeting headers.
@@ -141,13 +141,26 @@ public enum Tokens {
 
     // MARK: - Home Typography
 
-    /// Greeting title: Newsreader Display ~32, weight 500. Apply `greetingTracking` via `.tracking()`.
+    /// Page title: 26pt bold.
+    public static let pageTitle = Font.pageTitle
+
+    /// Section title ("Recent meetings"): 17pt bold.
+    public static let sectionTitle = Font.sectionTitle
+
+    /// Featured card title: 22pt bold.
+    public static let featuredTitle = Font.featuredTitle
+
+    /// Tile / row title: 13pt semibold.
+    public static let tileTitle = Font.tileTitle
+
+    /// Legacy greeting slot, now the page title.
     public static let greetingFont = Font.serifGreeting
 
-    /// Tracking for the greeting title (-0.32pt).
-    public static let greetingTracking: CGFloat = -0.32
+    /// No tracking; kept until the last call site goes.
+    /// TODO: delete once no call site applies it.
+    public static let greetingTracking: CGFloat = 0
 
-    /// Date line: JetBrains Mono 15pt regular.
+    /// Date line: 13pt regular.
     public static let dateLine = Font.monoDate
 
     /// "Starting soon" hero title: 16pt semibold (SF Pro, unchanged).
@@ -162,16 +175,17 @@ public enum Tokens {
     /// Meta text medium weight: 12.5pt medium (SF Pro, unchanged).
     public static let metaTextMedium = Font.system(size: 12.5, weight: .medium)
 
-    /// Group label: JetBrains Mono 10.5pt medium (rendered uppercase). Apply `groupLabelTracking`.
+    /// Group label: 12pt semibold, sentence case.
     public static let groupLabel = Font.monoKicker
 
-    /// Tracking for group labels (+1.47pt, approx +0.14em at 10.5).
-    public static let groupLabelTracking: CGFloat = 1.47
+    /// No tracking; kept until the last call site goes.
+    /// TODO: delete once no call site applies it.
+    public static let groupLabelTracking: CGFloat = 0
 
     /// Chip / Meet label: 11pt medium (SF Pro, unchanged).
     public static let chipLabel = Font.system(size: 11, weight: .medium)
 
-    /// Stat chip text: JetBrains Mono 12.5pt medium.
+    /// Stat text: 13pt medium, aligned digits.
     public static let statChipText = Font.monoStat
 
     /// Join button label: 13.5pt semibold (SF Pro, unchanged).

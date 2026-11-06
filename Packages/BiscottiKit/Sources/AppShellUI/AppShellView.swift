@@ -344,7 +344,7 @@ private struct UpcomingSidebarSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("UPCOMING")
+            Text("Upcoming")
                 .kicker()
                 .foregroundStyle(.inkSecondary)
                 .padding(.horizontal, Tokens.spacingMD)
@@ -517,7 +517,7 @@ private struct RecordingNowSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("RECORDING NOW")
+            Text("Recording now")
                 .kicker()
                 .foregroundStyle(Color.inkSecondary)
                 .padding(.horizontal, Tokens.spacingMD)

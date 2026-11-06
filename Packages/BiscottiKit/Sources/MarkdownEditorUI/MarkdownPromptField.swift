@@ -24,7 +24,7 @@ public struct MarkdownPromptField: View {
     /// - Parameters:
     ///   - text: Two-way binding to the raw markdown source string.
     ///   - documentId: Stable per-document identity for undo / editor state.
-    ///   - monospace: When `true`, renders in JetBrains Mono instead of the
+    ///   - monospace: When `true`, renders in the system monospaced font instead of the
     ///     system body font. Falls back to system font if the mono font is
     ///     unavailable.
     public init(text: Binding<String>, documentId: String, monospace: Bool = false) {
@@ -50,7 +50,7 @@ public struct MarkdownPromptField: View {
 
     private var resolvedFontName: String {
         if monospace {
-            return MonoWeight.regular.postScriptName
+            return NSFont.monospacedSystemFont(ofSize: Self.fontSize, weight: .regular).fontName
         }
         return NSFont.systemFont(ofSize: NSFont.systemFontSize).fontName
     }

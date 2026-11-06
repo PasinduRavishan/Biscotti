@@ -150,7 +150,6 @@ private struct WindowRootView: View {
             }
         }
         .onAppear {
-            FontRegistration.ensure()
             ThemeApplier.apply(ThemeStore().theme)
             let captured = openWindow
             launchState.sceneOpener = {

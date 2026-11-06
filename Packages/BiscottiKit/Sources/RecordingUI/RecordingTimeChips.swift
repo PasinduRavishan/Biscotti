@@ -28,7 +28,7 @@ extension RecordingView {
 
             HStack(spacing: 9) {
                 timeChip(
-                    kicker: "ELAPSED",
+                    kicker: "Elapsed",
                     value: elapsed,
                     style: .neutral
                 )
@@ -38,19 +38,19 @@ extension RecordingView {
                     EmptyView()
                 case let .normal(label):
                     timeChip(
-                        kicker: "REMAINING",
+                        kicker: "Remaining",
                         value: label,
                         style: .neutral
                     )
                 case let .warning(label):
                     timeChip(
-                        kicker: "REMAINING",
+                        kicker: "Remaining",
                         value: label,
                         style: .warning
                     )
                 case let .overtime(label):
                     timeChip(
-                        kicker: "OVER",
+                        kicker: "Over",
                         value: label,
                         style: .warning
                     )
@@ -85,11 +85,10 @@ extension RecordingView {
 
         return HStack(spacing: 6) {
             Text(kicker)
-                .font(.biscottiMono(9.5, weight: .medium))
-                .tracking(1.4)
+                .font(.system(size: 9.5, weight: .medium).monospacedDigit())
                 .foregroundStyle(kickerColor)
             Text(value)
-                .font(.biscottiMono(14, weight: .medium))
+                .font(.system(size: 14, weight: .medium).monospacedDigit())
                 .foregroundStyle(valueColor)
                 .monospacedDigit()
 

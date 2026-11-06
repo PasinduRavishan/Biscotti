@@ -76,7 +76,7 @@ private extension EventPreviewView {
     func header(_ event: CalendarEvent) -> some View {
         VStack(alignment: .leading, spacing: Tokens.spacingXS) {
             Text(event.title)
-                .font(.biscottiSerif(27))
+                .font(.pageTitle)
                 .tracking(-0.27)
                 .foregroundStyle(.ink)
 
@@ -232,7 +232,7 @@ private extension EventPreviewView {
             // WHEN
             if let when = viewModel.formattedDateRange {
                 GridRow {
-                    Text("WHEN")
+                    Text("When")
                         .kicker()
                         .foregroundStyle(.inkTertiary)
                         .gridColumnAlignment(.leading)
@@ -246,7 +246,7 @@ private extension EventPreviewView {
             // WHERE
             if event.conferencePlatform != nil || event.location.flatMap({ $0.isEmpty ? nil : $0 }) != nil {
                 GridRow {
-                    Text("WHERE")
+                    Text("Where")
                         .kicker()
                         .foregroundStyle(.inkTertiary)
                     whereContent(event)
@@ -256,7 +256,7 @@ private extension EventPreviewView {
             // ATTENDEES
             if viewModel.avatarData.total > 0 {
                 GridRow {
-                    Text("ATTENDEES (\(viewModel.avatarData.total))")
+                    Text("Attendees (\(viewModel.avatarData.total))")
                         .kicker()
                         .foregroundStyle(.inkTertiary)
                     attendeesContent
@@ -266,7 +266,7 @@ private extension EventPreviewView {
             // DESCRIPTION
             if let notes = event.notes, !notes.isEmpty {
                 GridRow {
-                    Text("DESCRIPTION")
+                    Text("Description")
                         .kicker()
                         .foregroundStyle(.inkTertiary)
                     Text(notes)

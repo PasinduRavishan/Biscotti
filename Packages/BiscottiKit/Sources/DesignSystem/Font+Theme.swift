@@ -1,70 +1,53 @@
 import SwiftUI
 
-// MARK: - Mono weight
+// MARK: - Semantic type ramp (system font only)
 
-/// Weight variants for the bundled JetBrains Mono font.
-public enum MonoWeight: Sendable {
-    case regular
-    case medium
-
-    /// PostScript name for this weight.
-    public var postScriptName: String {
-        switch self {
-        case .regular: "JetBrainsMono-Regular"
-        case .medium: "JetBrainsMono-Medium"
-        }
-    }
-}
-
-// MARK: - Font factories
+// Every face is SF Pro. Monospaced digits appear only where numbers must line
+// up (timers, transport times, countdowns).
+//
+// TODO: rename the legacy `serif*` / `mono*` names to role names
+// (e.g. `onboardingTitle`, `metaText`); they no longer describe the faces.
 
 public extension Font {
-    /// Newsreader Display (serif), weight 500. Registration is ensured on first use.
-    static func biscottiSerif(_ size: CGFloat) -> Font {
-        FontRegistration.ensure()
-        return .custom("NewsreaderDisplay-Medium", size: size)
-    }
+    /// Page title ("Home", "Settings"): 26pt bold.
+    static let pageTitle: Font = .system(size: 26, weight: .bold)
 
-    /// JetBrains Mono (tabular figures by default). Registration is ensured on first use.
-    static func biscottiMono(_ size: CGFloat, weight: MonoWeight = .regular) -> Font {
-        FontRegistration.ensure()
-        return .custom(weight.postScriptName, size: size)
-    }
-}
+    /// Section title ("Recent meetings"): 17pt bold.
+    static let sectionTitle: Font = .system(size: 17, weight: .bold)
 
-// MARK: - Semantic type ramp
+    /// Featured card title: 22pt bold.
+    static let featuredTitle: Font = .system(size: 22, weight: .bold)
 
-public extension Font {
-    /// Greeting: Newsreader Display ~32, weight 500.
-    /// Apply `Tokens.greetingTracking` (-0.32) via `.tracking()`.
-    static let serifGreeting: Font = .biscottiSerif(32)
+    /// Tile / row title: 13pt semibold.
+    static let tileTitle: Font = .system(size: 13, weight: .semibold)
 
-    /// Onboarding headline / large empty-state headline: Newsreader Display, weight 500.
-    /// Uses the `.title2` point size (~22).
-    static let serifHeadline: Font = .biscottiSerif(22)
+    /// Legacy greeting slot, now the page title.
+    static let serifGreeting: Font = pageTitle
 
-    /// Date line: JetBrains Mono 15pt regular.
-    static let monoDate: Font = .biscottiMono(15)
+    /// Onboarding headline / large empty-state headline: 22pt bold.
+    static let serifHeadline: Font = .system(size: 22, weight: .bold)
 
-    /// Times ("9:00 AM"), past meta ("Today . 32m"), sidebar meeting time.
-    static let monoMeta: Font = .biscottiMono(12.5)
+    /// Date line: 13pt regular.
+    static let monoDate: Font = .system(size: 13)
 
-    /// Countdown ("in 6m"): JetBrains Mono 12.5pt medium.
-    static let monoMetaMedium: Font = .biscottiMono(12.5, weight: .medium)
+    /// Times, past meta, sidebar meeting time: 13pt regular, aligned digits.
+    static let monoMeta: Font = .system(size: 13).monospacedDigit()
 
-    /// Stat chip value: JetBrains Mono 12.5pt medium.
-    static let monoStat: Font = .biscottiMono(12.5, weight: .medium)
+    /// Countdown ("in 6m"): 13pt medium, aligned digits.
+    static let monoMetaMedium: Font = .system(size: 13, weight: .medium).monospacedDigit()
 
-    /// "+N" overflow badge: JetBrains Mono ~9pt medium.
-    static let monoBadge: Font = .biscottiMono(9, weight: .medium)
+    /// Stat value: 13pt medium, aligned digits.
+    static let monoStat: Font = .system(size: 13, weight: .medium).monospacedDigit()
 
-    /// Kicker labels ("UPCOMING", "PAST MEETINGS"): JetBrains Mono 10.5pt medium.
-    /// Combine with `.kicker()` modifier for uppercase + tracking.
-    static let monoKicker: Font = .biscottiMono(10.5, weight: .medium)
+    /// "+N" overflow badge: 10pt semibold.
+    static let monoBadge: Font = .system(size: 10, weight: .semibold)
 
-    /// Recording elapsed counter: JetBrains Mono largeTitle (~34pt), weight 500.
-    static let monoElapsed: Font = .biscottiMono(34, weight: .medium)
+    /// Section labels ("Upcoming"): 12pt semibold, sentence case.
+    static let monoKicker: Font = .system(size: 12, weight: .semibold)
 
-    /// Audio transport times: JetBrains Mono caption (~10pt).
-    static let monoCaption: Font = .biscottiMono(10)
+    /// Recording elapsed counter: 34pt medium, aligned digits.
+    static let monoElapsed: Font = .system(size: 34, weight: .medium).monospacedDigit()
+
+    /// Audio transport times: 11pt, aligned digits.
+    static let monoCaption: Font = .system(size: 11).monospacedDigit()
 }

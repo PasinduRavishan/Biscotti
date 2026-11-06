@@ -2,19 +2,18 @@ import SwiftUI
 
 // MARK: - Kicker modifier
 
-/// Applies the kicker style: JetBrains Mono 10.5pt medium, uppercase, tracking +1.47.
-/// Usage: `Text("UPCOMING").kicker()`
+/// Applies the section-label style: 12pt semibold, secondary color, sentence case.
+/// Usage: `Text("Upcoming").kicker()`
 private struct KickerModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .font(.monoKicker)
-            .textCase(.uppercase)
-            .tracking(1.47)
+            .foregroundStyle(.inkSecondary)
     }
 }
 
 public extension View {
-    /// Style this text as an uppercase mono kicker label.
+    /// Style this text as a small section label.
     func kicker() -> some View {
         modifier(KickerModifier())
     }

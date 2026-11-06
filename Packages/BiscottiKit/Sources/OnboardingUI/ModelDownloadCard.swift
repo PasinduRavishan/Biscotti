@@ -188,7 +188,7 @@ struct DownloadControl: View {
                     action: onDownload
                 )
                 Text(sizeCaption)
-                    .font(.biscottiMono(11))
+                    .font(.system(size: 11).monospacedDigit())
                     .foregroundStyle(.inkTertiary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -197,14 +197,14 @@ struct DownloadControl: View {
                 downloadingContent(progress)
 
             case .ready:
-                GrantedTag("READY")
+                GrantedTag("Ready")
 
             case .insufficientDisk:
                 diskWarning
 
             case let .failed(message):
                 Text(message)
-                    .font(.biscottiMono(11))
+                    .font(.system(size: 11).monospacedDigit())
                     .foregroundStyle(.signalRedText)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -231,7 +231,7 @@ struct DownloadControl: View {
             IndeterminateBar(trackWidth: controlWidth)
             if let status {
                 Text(status)
-                    .font(.biscottiMono(11))
+                    .font(.system(size: 11).monospacedDigit())
                     .foregroundStyle(.inkSecondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -241,14 +241,14 @@ struct DownloadControl: View {
             if let fraction {
                 determinateBar(fraction: fraction)
                 Text("Downloading\u{2026} \(Int(fraction * 100))%")
-                    .font(.biscottiMono(11))
+                    .font(.system(size: 11).monospacedDigit())
                     .foregroundStyle(.inkSecondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
                 IndeterminateBar(trackWidth: controlWidth)
                 Text("Downloading\u{2026}")
-                    .font(.biscottiMono(11))
+                    .font(.system(size: 11).monospacedDigit())
                     .foregroundStyle(.inkSecondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)

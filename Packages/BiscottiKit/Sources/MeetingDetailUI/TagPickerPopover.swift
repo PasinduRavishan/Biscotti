@@ -86,7 +86,7 @@ struct TagPickerPopover: View {
     // MARK: - Kicker
 
     private var tagsKicker: some View {
-        Text("TAGS")
+        Text("Tags")
             .kicker()
             .foregroundStyle(.inkTertiary)
             .padding(.horizontal, Tokens.spacingSM)

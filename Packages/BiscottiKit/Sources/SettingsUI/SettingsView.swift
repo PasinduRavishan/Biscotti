@@ -63,7 +63,7 @@ public struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Tokens.spacingMD) {
                 Text(Self.pageTitle)
-                    .font(.biscottiSerif(27))
+                    .font(.pageTitle)
                     .tracking(-0.27)
                     .foregroundStyle(.ink)
                     // Match the grouped Form's internal leading inset

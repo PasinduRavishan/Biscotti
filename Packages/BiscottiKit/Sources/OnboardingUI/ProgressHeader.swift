@@ -9,11 +9,11 @@ struct ProgressHeader: View {
     /// Kicker text for each screen.
     private var kickerText: String {
         switch step {
-        case .welcome: "WELCOME"
-        case .permissions: "PERMISSIONS"
-        case .calendarSelection: "CALENDARS"
-        case .modelDownload: "AI MODELS"
-        case .done: "FINISH"
+        case .welcome: "Welcome"
+        case .permissions: "Permissions"
+        case .calendarSelection: "Calendars"
+        case .modelDownload: "AI models"
+        case .done: "Finish"
         }
     }
 

@@ -185,7 +185,7 @@ public struct CalendarInfoCard: View {
         ) {
             if let when = data.whenText {
                 GridRow {
-                    Text("WHEN")
+                    Text("When")
                         .kicker()
                         .foregroundStyle(.inkTertiary)
                         .gridColumnAlignment(.leading)
@@ -198,7 +198,7 @@ public struct CalendarInfoCard: View {
 
             if data.platform != nil || data.location != nil {
                 GridRow {
-                    Text("WHERE")
+                    Text("Where")
                         .kicker()
                         .foregroundStyle(.inkTertiary)
                     whereContent
@@ -207,7 +207,7 @@ public struct CalendarInfoCard: View {
 
             if let invited = data.invitedText {
                 GridRow {
-                    Text("INVITED")
+                    Text("Invited")
                         .kicker()
                         .foregroundStyle(.inkTertiary)
                     Text(invited)
@@ -219,7 +219,7 @@ public struct CalendarInfoCard: View {
 
             if let notes = data.eventNotes, !notes.isEmpty {
                 GridRow {
-                    Text("DESCRIPTION")
+                    Text("Description")
                         .kicker()
                         .foregroundStyle(.inkTertiary)
                     Text(notes)

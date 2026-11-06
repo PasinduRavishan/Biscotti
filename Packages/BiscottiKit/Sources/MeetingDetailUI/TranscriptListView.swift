@@ -216,7 +216,7 @@ struct TranscriptSegmentRow: View, Equatable {
                     Text(
                         "\(TimeFormatting.formatPlaybackTime(segment.startTime)) \u{25B6}\u{FE0E}"
                     )
-                    .font(Font.biscottiMono(12))
+                    .font(.system(size: 12).monospacedDigit())
                     .foregroundStyle(.inkTertiary)
                 }
                 .buttonStyle(.plain)
@@ -224,7 +224,7 @@ struct TranscriptSegmentRow: View, Equatable {
                 .padding(.leading, Tokens.spacingXS)
             } else {
                 Text(TimeFormatting.formatPlaybackTime(segment.startTime))
-                    .font(Font.biscottiMono(12))
+                    .font(.system(size: 12).monospacedDigit())
                     .foregroundStyle(.inkTertiary)
                     .padding(.leading, Tokens.spacingXS)
             }

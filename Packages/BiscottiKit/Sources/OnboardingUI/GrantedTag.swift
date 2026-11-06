@@ -8,7 +8,7 @@ import SwiftUI
 struct GrantedTag: View {
     private let label: String
 
-    init(_ label: String = "GRANTED") {
+    init(_ label: String = "Granted") {
         self.label = label
     }
 

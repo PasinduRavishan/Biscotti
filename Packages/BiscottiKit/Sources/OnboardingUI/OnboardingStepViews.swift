@@ -13,7 +13,7 @@ extension OnboardingView {
     var welcomeStep: some View {
         VStack(spacing: 0) {
             Text("Welcome to Biscotti")
-                .font(.biscottiSerif(46))
+                .font(.system(size: 40, weight: .bold))
                 .foregroundStyle(.ink)
 
             Text(
@@ -37,7 +37,7 @@ extension OnboardingView {
     var grantAccessStep: some View {
         VStack(spacing: 0) {
             Text("Grant access")
-                .font(.biscottiSerif(34))
+                .font(.system(size: 28, weight: .bold))
                 .foregroundStyle(.ink)
 
             Text(
@@ -124,7 +124,7 @@ extension OnboardingView {
                     ProgressView()
                         .controlSize(.small)
                     Text("Validating\u{2026}")
-                        .font(.biscottiMono(11))
+                        .font(.system(size: 11).monospacedDigit())
                         .foregroundStyle(.inkSecondary)
                 }
             } else {
@@ -136,7 +136,7 @@ extension OnboardingView {
                 case .requestedNotVerified:
                     VStack(alignment: .trailing, spacing: 6) {
                         Text("Not approved")
-                            .font(.biscottiMono(11))
+                            .font(.system(size: 11).monospacedDigit())
                             .foregroundStyle(.inkSecondary)
                         HStack(spacing: 8) {
                             Button("Retry") {
@@ -206,7 +206,7 @@ extension OnboardingView {
     var calendarSelectionStep: some View {
         VStack(spacing: 0) {
             Text("Choose calendars")
-                .font(.biscottiSerif(34))
+                .font(.system(size: 28, weight: .bold))
                 .foregroundStyle(.ink)
 
             Text("Select which calendars to monitor for meetings.")
@@ -319,7 +319,7 @@ extension OnboardingView {
     var modelDownloadStep: some View {
         VStack(spacing: 0) {
             Text("Download Local AI Models")
-                .font(.biscottiSerif(34))
+                .font(.system(size: 28, weight: .bold))
                 .foregroundStyle(.ink)
 
             Text(
@@ -348,7 +348,7 @@ extension OnboardingView {
     var doneStep: some View {
         VStack(spacing: 0) {
             Text("You\u{2019}re all set")
-                .font(.biscottiSerif(50))
+                .font(.system(size: 44, weight: .bold))
                 .foregroundStyle(.ink)
 
             Text("Start recording your first meeting whenever you like.")
@@ -390,7 +390,7 @@ extension OnboardingView {
 
             // Always present (blank => reserves one line, no layout shift).
             Text(viewModel.footerCaption.isEmpty ? " " : viewModel.footerCaption)
-                .font(.biscottiMono(11))
+                .font(.system(size: 11).monospacedDigit())
                 .foregroundStyle(.inkSecondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(1)

@@ -36,12 +36,12 @@ struct VocabularyListSheet: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: Tokens.spacingXS) {
-            Text("SETTINGS")
+            Text("Settings")
                 .kicker()
                 .foregroundStyle(.sage)
 
             Text("Vocabulary List")
-                .font(.biscottiSerif(27))
+                .font(.pageTitle)
                 .tracking(-0.27)
                 .foregroundStyle(.ink)
 

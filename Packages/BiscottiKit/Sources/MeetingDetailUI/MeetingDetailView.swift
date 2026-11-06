@@ -410,7 +410,7 @@ private extension MeetingDetailView {
                     text: $viewModel.editableTitle,
                     placeholder: "Untitled meeting",
                     fieldPrompt: "Meeting title",
-                    font: .biscottiSerif(27)
+                    font: .pageTitle
                 ) {
                     await viewModel.saveTitle()
                 }
