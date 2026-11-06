@@ -166,26 +166,36 @@ public struct MeetingListView: View {
 
     private func meetingRow(_ meeting: MeetingSummary) -> some View {
         let isSelected = viewModel.selectedIDs.contains(meeting.id)
-        return VStack(alignment: .leading, spacing: 2) {
-            Text(meeting.title)
-                .font(.system(size: 13.5, weight: .medium))
-                .foregroundStyle(isSelected ? .onAccent : .ink)
-                .lineLimit(1)
+        return HStack(alignment: .firstTextBaseline, spacing: 10) {
+            RoundedRectangle(cornerRadius: 3)
+                .fill(TileColor.fill(hex: meeting.calendarColorHex))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 3)
+                        .strokeBorder(Color.onAccentChipRing, lineWidth: isSelected ? 0.5 : 0)
+                )
+                .frame(width: 10, height: 10)
 
-            Text(MeetingListViewModel.secondLineText(for: meeting))
-                .font(.monoMeta)
-                .foregroundStyle(isSelected ? .onAccentMuted : .inkSecondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(meeting.title)
+                    .font(.tileTitle)
+                    .foregroundStyle(isSelected ? .onAccent : .ink)
+                    .lineLimit(1)
 
-            if !meeting.tags.isEmpty {
-                tagLine(meeting.tags, isSelected: isSelected)
-                    .padding(.top, 4)
+                Text(MeetingListViewModel.secondLineText(for: meeting))
+                    .font(.monoMeta)
+                    .foregroundStyle(isSelected ? .onAccentMuted : .inkSecondary)
+
+                if !meeting.tags.isEmpty {
+                    tagLine(meeting.tags, isSelected: isSelected)
+                        .padding(.top, 4)
+                }
             }
         }
         .listRowSeparator(.hidden)
         .listRowBackground(selectionBackground(isSelected))
     }
 
-    /// The custom selection background: solid sage fill when selected,
+    /// The custom selection background: solid accent fill when selected,
     /// clear when not. Paints our own selection independent of the system accent.
     @ViewBuilder
     private func selectionBackground(_ isSelected: Bool) -> some View {

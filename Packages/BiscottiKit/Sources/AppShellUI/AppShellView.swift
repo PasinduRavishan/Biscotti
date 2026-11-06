@@ -169,11 +169,7 @@ public struct AppShellView: View {
         } label: {
             HStack(spacing: Tokens.spacingSM) {
                 Image(systemName: "house")
-                    .foregroundStyle(
-                        viewModel.route == .home
-                            ? Color.sage
-                            : Tokens.secondaryText
-                    )
+                    .foregroundStyle(Color.sage)
                 Text("Home")
                     .font(.body)
                 Spacer()
@@ -186,7 +182,7 @@ public struct AppShellView: View {
             viewModel.route == .home
                 ? Tokens.accentWashStrong
                 : Color.clear,
-            in: RoundedRectangle(cornerRadius: 4)
+            in: RoundedRectangle(cornerRadius: 7)
         )
     }
 
@@ -196,12 +192,8 @@ public struct AppShellView: View {
         } label: {
             HStack(spacing: Tokens.spacingSM) {
                 Image(systemName: "clock")
-                    .foregroundStyle(
-                        viewModel.route == .meetings
-                            ? Color.sage
-                            : Tokens.secondaryText
-                    )
-                Text("Past Meetings")
+                    .foregroundStyle(Color.sage)
+                Text("Past meetings")
                     .font(.body)
                 Spacer()
             }
@@ -213,7 +205,7 @@ public struct AppShellView: View {
             viewModel.route == .meetings
                 ? Tokens.accentWashStrong
                 : Color.clear,
-            in: RoundedRectangle(cornerRadius: 4)
+            in: RoundedRectangle(cornerRadius: 7)
         )
     }
 
@@ -227,11 +219,7 @@ public struct AppShellView: View {
         } label: {
             HStack(spacing: Tokens.spacingSM) {
                 Image(systemName: "gearshape")
-                    .foregroundStyle(
-                        viewModel.route == .settings
-                            ? Color.sage
-                            : Tokens.secondaryText
-                    )
+                    .foregroundStyle(Color.sage)
                 Text("Settings")
                     .font(.body)
                 Spacer()
@@ -250,7 +238,7 @@ public struct AppShellView: View {
             viewModel.route == .settings
                 ? Tokens.accentWashStrong
                 : Color.clear,
-            in: RoundedRectangle(cornerRadius: 4)
+            in: RoundedRectangle(cornerRadius: 7)
         )
     }
 
@@ -368,7 +356,7 @@ private struct UpcomingSidebarSection: View {
                     viewModel.route == .event(event.id)
                         ? Tokens.accentWashStrong
                         : Color.clear,
-                    in: RoundedRectangle(cornerRadius: 4)
+                    in: RoundedRectangle(cornerRadius: 7)
                 )
             }
 
@@ -546,7 +534,7 @@ private struct RecordingNowSection: View {
                 isSelected
                     ? Tokens.accentWashStrong
                     : Color.clear,
-                in: RoundedRectangle(cornerRadius: 4)
+                in: RoundedRectangle(cornerRadius: 7)
             )
 
             Divider()
