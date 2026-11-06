@@ -284,3 +284,29 @@ struct ReadModelTests {
         )
     }
 }
+
+@Suite("DataStore read-model DTOs -- calendar color")
+struct MeetingSummaryCalendarColorTests {
+    @Test("a summary carries its calendar snapshot's color")
+    func summaryCarriesCalendarColor() async throws {
+        let store = try DataStore(storage: .inMemory)
+        let meetingID = try await store.createMeeting(title: "Design sync")
+        let snapshot = CalendarSnapshot(compositeKey: "color-test", title: "Design sync", calendarColorHex: "#1F6FB2")
+        try await store.setSnapshot(snapshot, for: meetingID)
+
+        let summaries = try await store.meetingSummaries()
+
+        #expect(summaries.first { $0.id == meetingID }?.calendarColorHex == "#1F6FB2")
+    }
+
+    @Test("a summary without a calendar snapshot has no color")
+    func summaryWithoutSnapshotHasNilColor() async throws {
+        let store = try DataStore(storage: .inMemory)
+        let meetingID = try await store.createMeeting(title: "Hallway chat")
+
+        let summaries = try await store.meetingSummaries()
+
+        let summary = try #require(summaries.first { $0.id == meetingID })
+        #expect(summary.calendarColorHex == nil)
+    }
+}

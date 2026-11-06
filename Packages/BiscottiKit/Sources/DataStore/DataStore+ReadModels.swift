@@ -19,6 +19,9 @@ public struct MeetingSummary: Sendable, Identifiable, Equatable {
     public let participantCount: Int
     /// Tags applied to this meeting, sorted alphabetically.
     public let tags: [TagData]
+    /// `#RRGGBB` of the linked calendar event's calendar, or `nil` when the
+    /// meeting has no calendar snapshot.
+    public let calendarColorHex: String?
 
     public init(
         id: UUID,
@@ -28,7 +31,8 @@ public struct MeetingSummary: Sendable, Identifiable, Equatable {
         recordingDuration: TimeInterval? = nil,
         participants: [PersonData] = [],
         participantCount: Int = 0,
-        tags: [TagData] = []
+        tags: [TagData] = [],
+        calendarColorHex: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -38,6 +42,7 @@ public struct MeetingSummary: Sendable, Identifiable, Equatable {
         self.participants = participants
         self.participantCount = participantCount
         self.tags = tags
+        self.calendarColorHex = calendarColorHex
     }
 }
 
@@ -474,7 +479,8 @@ public extension DataStore {
                 recordingDuration: meeting.recordingDuration,
                 participants: mappedParticipants,
                 participantCount: deduped.count,
-                tags: mappedTags
+                tags: mappedTags,
+                calendarColorHex: meeting.calendarSnapshot?.calendarColorHex
             )
         }
     }
