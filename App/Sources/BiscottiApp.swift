@@ -139,7 +139,6 @@ private struct WindowRootView: View {
         Group {
             if let shellVM = launchState.shellViewModel {
                 AppShellView(viewModel: shellVM)
-                    .tint(.sage)
             } else if let err = launchState.launchError {
                 errorView(message: err)
             } else {
@@ -152,6 +151,7 @@ private struct WindowRootView: View {
         }
         .onAppear {
             FontRegistration.ensure()
+            ThemeApplier.apply(ThemeStore().theme)
             let captured = openWindow
             launchState.sceneOpener = {
                 captured(id: "main")

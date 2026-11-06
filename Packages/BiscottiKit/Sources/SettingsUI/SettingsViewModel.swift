@@ -2,6 +2,7 @@ import AppCore
 import AppKit
 import Calendar
 import DataStore
+import DesignSystem
 import Foundation
 import ImportExport
 import Intelligence
@@ -63,6 +64,9 @@ public final class SettingsViewModel {
     /// Defaults to a live `NSSavePanel` pre-filled with that name
     /// (functional spec §5.2). Injected in tests.
     let presentSavePanel: @MainActor (String) -> URL?
+
+    /// Theme preference state (see `SettingsViewModel+Theme.swift`).
+    let themeSettings: ThemeSettings
 
     // MARK: - General
 
@@ -179,9 +183,12 @@ public final class SettingsViewModel {
         core: AppCore,
         readLaunchAtLoginStatus: (@MainActor () -> Bool)? = nil,
         presentOpenPanel: (@MainActor () -> URL?)? = nil,
-        presentSavePanel: (@MainActor (String) -> URL?)? = nil
+        presentSavePanel: (@MainActor (String) -> URL?)? = nil,
+        themeStore: ThemeStore = ThemeStore(),
+        applyTheme: @escaping @MainActor (AppTheme) -> Void = ThemeApplier.apply
     ) {
         appCore = core
+        themeSettings = ThemeSettings(store: themeStore, apply: applyTheme)
         self.readLaunchAtLoginStatus = readLaunchAtLoginStatus ?? {
             #if canImport(ServiceManagement)
                 ServiceManagement.SMAppService.mainApp.status == .enabled
@@ -465,11 +472,13 @@ public final class SettingsViewModel {
         let infos = await core.calendar.calendars()
         calendarGroups = Self.groupCalendars(infos)
     }
+}
 
-    // MARK: - Grouping (pure, testable)
+// MARK: - Grouping (pure, testable; extracted for type_body_length)
 
+public extension SettingsViewModel {
     /// Groups CalendarInfo items by sourceTitle.
-    public static func groupCalendars(
+    static func groupCalendars(
         _ infos: [CalendarInfo]
     ) -> [CalendarGroup] {
         let grouped = Dictionary(grouping: infos, by: \.sourceTitle)

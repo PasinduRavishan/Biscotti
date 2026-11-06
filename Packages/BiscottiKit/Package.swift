@@ -452,6 +452,7 @@ let package = Package(
                 "BiscottiTestSupport",
                 "Calendar",
                 "DataStore",
+                "DesignSystem",
                 "ImportExport",
                 "Intelligence",
                 "MCPServer",

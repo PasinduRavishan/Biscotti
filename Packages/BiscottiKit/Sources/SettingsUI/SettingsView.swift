@@ -98,6 +98,12 @@ public struct SettingsView: View {
 
     private var generalSection: some View {
         Section(Self.sectionTitles[0]) {
+            Picker("Theme", selection: themeBinding) {
+                ForEach(AppTheme.allCases) { option in
+                    Text(option.displayName).tag(option)
+                }
+            }
+            .pickerStyle(.segmented)
             Toggle(
                 "Launch at login",
                 isOn: launchAtLoginBinding
@@ -502,6 +508,13 @@ private extension SettingsView {
 // MARK: - General section bindings & App Updates row
 
 private extension SettingsView {
+    var themeBinding: Binding<AppTheme> {
+        Binding(
+            get: { viewModel.theme },
+            set: { viewModel.setTheme($0) }
+        )
+    }
+
     var launchAtLoginBinding: Binding<Bool> {
         Binding(
             get: { viewModel.launchAtLogin },
