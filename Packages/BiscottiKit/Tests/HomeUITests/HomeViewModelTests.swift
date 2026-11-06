@@ -436,68 +436,10 @@ struct HomeViewModelActionTests {
     }
 }
 
-// MARK: - Greeting tests
+// MARK: - Date tests
 
-@Suite("HomeViewModel -- greeting & date")
-struct HomeViewModelGreetingTests {
-    @Test("greeting returns correct time-of-day text")
-    @MainActor
-    func greetingBoundaries() throws {
-        let fix = try makeCoreFixture(testName: "HomeUIGreeting")
-        defer { fix.cleanup() }
-
-        let viewModel = HomeViewModel(core: fix.core)
-
-        // Morning: 9 AM
-        let morning = try #require(Foundation.Calendar.current.date(
-            bySettingHour: 9, minute: 0, second: 0, of: Date()
-        ))
-        fix.core.setMinuteTick(morning)
-        #expect(viewModel.greeting == "Good morning")
-
-        // Afternoon: 2 PM
-        let afternoon = try #require(Foundation.Calendar.current.date(
-            bySettingHour: 14, minute: 0, second: 0, of: Date()
-        ))
-        fix.core.setMinuteTick(afternoon)
-        #expect(viewModel.greeting == "Good afternoon")
-
-        // Evening: 8 PM
-        let evening = try #require(Foundation.Calendar.current.date(
-            bySettingHour: 20, minute: 0, second: 0, of: Date()
-        ))
-        fix.core.setMinuteTick(evening)
-        #expect(viewModel.greeting == "Good evening")
-    }
-
-    @Test("greeting boundary at noon is afternoon")
-    @MainActor
-    func greetingNoon() throws {
-        let fix = try makeCoreFixture(testName: "HomeUIGreetingNoon")
-        defer { fix.cleanup() }
-
-        let viewModel = HomeViewModel(core: fix.core)
-        let noon = try #require(Foundation.Calendar.current.date(
-            bySettingHour: 12, minute: 0, second: 0, of: Date()
-        ))
-        fix.core.setMinuteTick(noon)
-        #expect(viewModel.greeting == "Good afternoon")
-    }
-
-    @Test("greeting boundary at 6 PM is evening")
-    @MainActor
-    func greetingEvening() throws {
-        let fix = try makeCoreFixture(testName: "HomeUIGreetingEve")
-        defer { fix.cleanup() }
-
-        let viewModel = HomeViewModel(core: fix.core)
-        let sixPM = try #require(Foundation.Calendar.current.date(
-            bySettingHour: 18, minute: 0, second: 0, of: Date()
-        ))
-        fix.core.setMinuteTick(sixPM)
-        #expect(viewModel.greeting == "Good evening")
-    }
-
+@Suite("HomeViewModel -- date")
+struct HomeViewModelDateTests {
     @Test("dateText is formatted as EEEE, MMMM d")
     @MainActor
     func dateTextFormat() throws {
@@ -1042,4 +984,154 @@ private func makeEventDTO(
         attendees: [],
         organizer: nil
     )
+}
+
+// MARK: - Games-style Home tests
+
+private func makeUpcomingDTOs(count: Int, now: Date) -> [EKEventDTO] {
+    (0 ..< count).map { idx in
+        EKEventDTO(
+            eventIdentifier: "ev-\(idx)",
+            calendarItemIdentifier: "ci-\(idx)",
+            calendarItemExternalIdentifier: "ext-\(idx)",
+            occurrenceDate: now,
+            title: "Event \(idx)",
+            startDate: now.addingTimeInterval(Double(idx + 1) * 600),
+            endDate: now.addingTimeInterval(Double(idx + 1) * 600 + 3600),
+            isAllDay: false,
+            location: "https://zoom.us/j/\(idx)",
+            url: nil,
+            timeZone: nil,
+            notes: nil,
+            status: nil,
+            availability: nil,
+            calendarIdentifier: "cal-1",
+            calendarTitle: "Work",
+            calendarColorHex: "#0066CC",
+            calendarSourceTitle: "iCloud",
+            birthdayContactIdentifier: nil,
+            attendeeCount: 3,
+            attendees: [],
+            organizer: nil
+        )
+    }
+}
+
+@Suite("HomeViewModel -- featured meeting and subtitle")
+struct HomeViewModelFeaturedTests {
+    @Test("subtitle is just the date when there are no stats")
+    @MainActor
+    func subtitleWithoutStats() throws {
+        let fix = try makeCoreFixture(calendarAuthStatus: .notDetermined, testName: "HomeUIFeatured")
+        defer { fix.cleanup() }
+
+        let viewModel = HomeViewModel(core: fix.core)
+
+        #expect(viewModel.subtitleText == viewModel.dateText)
+    }
+
+    @Test("subtitle joins the date, meetings left and next-in text")
+    @MainActor
+    func subtitleJoinsAvailableParts() async throws {
+        let fix = try makeCoreFixture(
+            calendarEventDTOs: makeUpcomingDTOs(count: 3, now: Date()),
+            testName: "HomeUIFeatured"
+        )
+        defer { fix.cleanup() }
+        try await fix.store.updateSettings { $0.onboardingComplete = true }
+        await fix.core.onLaunch()
+
+        let viewModel = HomeViewModel(core: fix.core)
+        let meetingsLeft = try #require(viewModel.meetingsLeftText)
+        let nextIn = try #require(viewModel.nextInText)
+
+        #expect(viewModel.subtitleText == "\(viewModel.dateText) · \(meetingsLeft) · Next \(nextIn)")
+    }
+
+    @Test("the featured event is the first upcoming one and the rest follow it")
+    @MainActor
+    func featuredIsFirstUpcoming() async throws {
+        let fix = try makeCoreFixture(
+            calendarEventDTOs: makeUpcomingDTOs(count: 3, now: Date()),
+            testName: "HomeUIFeatured"
+        )
+        defer { fix.cleanup() }
+        try await fix.store.updateSettings { $0.onboardingComplete = true }
+        await fix.core.onLaunch()
+
+        let viewModel = HomeViewModel(core: fix.core)
+
+        #expect(viewModel.featuredEvent?.title == "Event 0")
+        #expect(viewModel.secondaryUpcoming.map(\.title) == ["Event 1", "Event 2"])
+        #expect(viewModel.featuredInJoinWindow == true)
+        #expect(viewModel.featuredStatusText?.hasPrefix("Starting in ") == true)
+    }
+
+    @Test("no upcoming events means no featured card")
+    @MainActor
+    func noUpcomingMeansNoFeatured() async throws {
+        let fix = try makeCoreFixture(calendarAuthStatus: .authorized, calendarEventDTOs: [], testName: "HomeUIFeatured")
+        defer { fix.cleanup() }
+        try await fix.store.updateSettings { $0.onboardingComplete = true }
+        await fix.core.onLaunch()
+
+        let viewModel = HomeViewModel(core: fix.core)
+
+        #expect(viewModel.featuredEvent == nil)
+        #expect(viewModel.featuredStatusText == nil)
+        #expect(viewModel.secondaryUpcoming.isEmpty)
+        #expect(viewModel.featuredInJoinWindow == false)
+    }
+}
+
+@Suite("HomeViewModel -- featured status text")
+struct HomeViewModelFeaturedStatusTests {
+    private var calendar: Foundation.Calendar {
+        var calendar = Foundation.Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .gmt
+        return calendar
+    }
+
+    private let locale = Locale(identifier: "en_US_POSIX")
+
+    /// Thursday 2026-11-05 09:00 UTC.
+    private let now = Date(timeIntervalSince1970: 1_793_869_200)
+
+    private func event(startingIn offset: TimeInterval) -> CalendarEvent {
+        CalendarEvent(
+            id: "e",
+            title: "T",
+            start: now.addingTimeInterval(offset),
+            end: now.addingTimeInterval(offset + 1800),
+            conferencePlatform: nil,
+            conferenceURL: nil,
+            attendeeCount: 2,
+            calendarTitle: "W",
+            calendarColorHex: "#000000",
+            isMeetingLike: true
+        )
+    }
+
+    private func status(_ offset: TimeInterval) -> String {
+        HomeViewModel.featuredStatus(for: event(startingIn: offset), relativeTo: now, calendar: calendar, locale: locale)
+    }
+
+    @Test("an event inside the join window counts down in whole minutes")
+    func statusStartingSoon() {
+        #expect(status(6 * 60) == "Starting in 6 min")
+        #expect(status(5 * 60 + 10) == "Starting in 6 min")
+        #expect(status(20) == "Starting in 1 min")
+    }
+
+    @Test("an event that already started inside the window is happening now")
+    func statusHappeningNow() {
+        #expect(status(-2 * 60) == "Happening now")
+    }
+
+    @Test("later today, tomorrow and later this week use day words")
+    func statusLaterDays() {
+        #expect(status(3 * 3600 + 30 * 60) == "Today at 12:30 PM")
+        #expect(status(25 * 3600 + 30 * 60) == "Tomorrow at 10:30 AM")
+        #expect(status(3 * 86400) == "Sunday at 9:00 AM")
+    }
 }

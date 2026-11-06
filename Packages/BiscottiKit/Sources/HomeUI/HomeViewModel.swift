@@ -23,17 +23,7 @@ public final class HomeViewModel {
         self.urlOpener = urlOpener
     }
 
-    // MARK: - Greeting & date
-
-    /// Time-of-day greeting based on the minute tick.
-    public var greeting: String {
-        let hour = Foundation.Calendar.current.component(
-            .hour, from: core.minuteTick
-        )
-        if hour < 12 { return "Good morning" }
-        if hour < 18 { return "Good afternoon" }
-        return "Good evening"
-    }
+    // MARK: - Date & subtitle
 
     /// Today's date formatted as "Wednesday, June 12".
     public var dateText: String {
@@ -79,6 +69,68 @@ public final class HomeViewModel {
     /// Whether to show the stat chip row (only when calendar is authorized).
     public var showStatChips: Bool {
         calendarAccess == .authorized
+    }
+
+    /// The line under the page title: date, then whichever stats exist,
+    /// e.g. "Thursday, November 6 · 2 meetings left today · Next in 5h".
+    public var subtitleText: String {
+        [dateText, meetingsLeftText, nextInText.map { "Next \($0)" }]
+            .compactMap(\.self)
+            .joined(separator: " · ")
+    }
+
+    // MARK: - Featured meeting
+
+    /// The meeting shown in the large featured card: the first upcoming one.
+    public var featuredEvent: CalendarEvent? {
+        upcomingPreview.first
+    }
+
+    /// Whether the featured meeting is close enough to show join/record actions.
+    public var featuredInJoinWindow: Bool {
+        heroEvent != nil
+    }
+
+    /// Status line for the featured card ("Starting in 6 min", "Tomorrow at 10:30 AM").
+    public var featuredStatusText: String? {
+        featuredEvent.map { Self.featuredStatus(for: $0, relativeTo: core.minuteTick) }
+    }
+
+    /// Upcoming meetings after the featured one, shown as compact rows.
+    public var secondaryUpcoming: [CalendarEvent] {
+        Array(upcomingPreview.dropFirst())
+    }
+
+    /// Status text for a featured event relative to `now`. Inside the join
+    /// window it counts down (or says it's happening); otherwise it names the
+    /// day and time.
+    public nonisolated static func featuredStatus(
+        for event: CalendarEvent,
+        relativeTo now: Date,
+        calendar: Foundation.Calendar = .current,
+        locale: Locale = .current
+    ) -> String {
+        let delta = event.start.timeIntervalSince(now)
+        if abs(delta) <= MeetingTiming.joinWindowSeconds {
+            guard delta > 0 else { return "Happening now" }
+            return "Starting in \(max(1, Int((delta / 60).rounded(.up)))) min"
+        }
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.timeZone = calendar.timeZone
+        formatter.locale = locale
+        formatter.dateFormat = "h:mm a"
+        let time = formatter.string(from: event.start)
+        if calendar.isDate(event.start, inSameDayAs: now) {
+            return "Today at \(time)"
+        }
+        if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
+           calendar.isDate(event.start, inSameDayAs: tomorrow)
+        {
+            return "Tomorrow at \(time)"
+        }
+        formatter.dateFormat = "EEEE"
+        return "\(formatter.string(from: event.start)) at \(time)"
     }
 
     // MARK: - Hero detection

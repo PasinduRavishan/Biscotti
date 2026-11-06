@@ -2,10 +2,11 @@ import AppCore
 import Calendar
 import DataStore
 import DesignSystem
+import Formatting
 import SwiftUI
 
-/// The Home screen: greeting, stat chips, upcoming meetings, and
-/// recent meeting history in a centered column.
+/// The Home screen: page title and stats line, a featured card for the next
+/// meeting, compact rows for the rest, and recent meetings as tiles.
 public struct HomeView: View {
     @Bindable private var viewModel: HomeViewModel
 
@@ -17,17 +18,12 @@ public struct HomeView: View {
         GeometryReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    greetingBlock
-
-                    if viewModel.showStatChips {
-                        statChipsRow
-                            .padding(.top, 14)
-                    }
+                    titleBlock
 
                     HomeUpcomingSection(viewModel: viewModel)
-                        .padding(.top, Tokens.cardToGroupGap)
+                        .padding(.top, 18)
 
-                    HomePastSection(viewModel: viewModel)
+                    HomeRecentSection(viewModel: viewModel)
                         .padding(.top, Tokens.cardToGroupGap)
 
                     BrandFooter()
@@ -43,59 +39,48 @@ public struct HomeView: View {
         .background(Tokens.contentBackground.ignoresSafeArea())
     }
 
-    // MARK: - Greeting
-
-    private var greetingBlock: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(viewModel.greeting)
-                .font(Tokens.greetingFont)
-                .tracking(Tokens.greetingTracking)
+    private var titleBlock: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text("Home")
+                .font(.pageTitle)
                 .foregroundStyle(.ink)
 
-            Text(viewModel.dateText)
-                .font(Tokens.dateLine)
+            Text(viewModel.subtitleText)
+                .font(.system(size: 13))
                 .foregroundStyle(.inkSecondary)
-        }
-    }
-
-    // MARK: - Stat chips
-
-    private var statChipsRow: some View {
-        HStack(spacing: Tokens.statChipSpacing) {
-            if let text = viewModel.meetingsLeftText {
-                StatChip(
-                    icon: "calendar",
-                    tint: .sage,
-                    text: text
-                )
-            }
-            if let text = viewModel.nextInText {
-                StatChip(
-                    icon: "circle.fill",
-                    tint: .sage,
-                    text: "Next \(text)"
-                )
-            }
+                .lineLimit(1)
+                .truncationMode(.tail)
         }
     }
 }
 
-// MARK: - Upcoming section (extracted to stay under type-body-length limit)
+// MARK: - Upcoming section (featured card + compact rows)
 
 private struct HomeUpcomingSection: View {
     let viewModel: HomeViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HomeSharedViews.groupLabel("Upcoming")
-                .padding(.bottom, Tokens.groupToCardGap)
-
-            if viewModel.showConnectCalendar {
-                connectCalendarCard
-            } else if viewModel.showNoUpcoming {
-                noUpcomingCard
-            } else if !viewModel.upcomingPreview.isEmpty {
-                upcomingCard
+        if viewModel.showConnectCalendar {
+            connectCalendarCard
+        } else if viewModel.showNoUpcoming {
+            noUpcomingCard
+        } else if let event = viewModel.featuredEvent {
+            VStack(alignment: .leading, spacing: 10) {
+                featuredCard(event: event)
+                if !viewModel.secondaryUpcoming.isEmpty {
+                    VStack(spacing: 0) {
+                        ForEach(
+                            Array(viewModel.secondaryUpcoming.enumerated()),
+                            id: \.element.id
+                        ) { index, upcoming in
+                            if index > 0 {
+                                InsetDivider(leadingInset: 34)
+                            }
+                            compactRow(event: upcoming)
+                        }
+                    }
+                    .homeCard()
+                }
             }
         }
     }
@@ -109,7 +94,7 @@ private struct HomeUpcomingSection: View {
             Button("Allow Calendar Access") {
                 Task { await viewModel.requestCalendarAccess() }
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(PillButtonStyle(.accent))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, Tokens.spacingLG)
@@ -125,168 +110,76 @@ private struct HomeUpcomingSection: View {
             .homeCard()
     }
 
-    private var upcomingCard: some View {
-        VStack(spacing: 0) {
-            ForEach(
-                Array(viewModel.upcomingPreview.enumerated()),
-                id: \.element.id
-            ) { index, event in
-                if index > 0 {
-                    InsetDivider()
+    // MARK: Featured card
+
+    /// The card opens the event on tap; its pill buttons sit on top and take
+    /// their own clicks (a Button wrapping Buttons would swallow them).
+    private func featuredCard(event: CalendarEvent) -> some View {
+        FeaturedCard(
+            colorHex: event.calendarColorHex,
+            status: viewModel.featuredStatusText ?? "",
+            title: event.title,
+            detail: featuredDetail(event: event)
+        ) {
+            if viewModel.featuredInJoinWindow {
+                Button {
+                    Task { await viewModel.joinAndRecord(event) }
+                } label: {
+                    Label(
+                        viewModel.heroIsRecordOnly ? "Record" : "Join and record",
+                        systemImage: "record.circle"
+                    )
                 }
-                if index == 0, viewModel.heroEvent != nil {
-                    heroRow(event: event)
-                } else {
-                    ordinaryUpcomingRow(event: event)
-                }
+                .buttonStyle(PillButtonStyle(.primaryOnColor))
+                .disabled(viewModel.recordDisabled)
             }
+
+            Button("View in calendar") {
+                viewModel.openInCalendar(event)
+            }
+            .buttonStyle(PillButtonStyle(.secondaryOnColor))
         }
-        .homeCard()
+        .contentShape(RoundedRectangle(cornerRadius: Tokens.cardRadius))
+        .onTapGesture { viewModel.selectEvent(event.id) }
+        .accessibilityAddTraits(.isButton)
     }
 
-    // MARK: - Hero row
-
-    private func heroRow(event: CalendarEvent) -> some View {
+    /// "10:30 – 11:00 AM · Google Meet · Ana, Raj, +3"
+    private func featuredDetail(event: CalendarEvent) -> String {
         let data = viewModel.avatarData(for: event)
+        let names = data.people.prefix(3).map(\.displayName)
+        let overflow = data.total - names.count
+        var people = names.joined(separator: ", ")
+        if overflow > 0, !people.isEmpty {
+            people += ", +\(overflow)"
+        }
+        let time = "\(HomeSharedViews.formattedTime(event.start)) – \(HomeSharedViews.formattedTime(event.end))"
+        return [time, event.conferencePlatform, people.isEmpty ? nil : people]
+            .compactMap(\.self)
+            .joined(separator: " · ")
+    }
 
-        return Button {
+    // MARK: Compact row
+
+    private func compactRow(event: CalendarEvent) -> some View {
+        Button {
             viewModel.selectEvent(event.id)
         } label: {
-            HStack(alignment: .center, spacing: 0) {
-                AvatarCluster(
-                    people: data.people,
-                    totalCount: data.total,
-                    size: Tokens.heroAvatarSize
-                )
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(TileColor.fill(hex: event.calendarColorHex))
+                    .frame(width: 10, height: 10)
 
-                heroCenterStack(event: event, data: data)
+                Text(event.title)
+                    .font(.tileTitle)
+                    .foregroundStyle(.ink)
+                    .lineLimit(1)
 
                 Spacer(minLength: 8)
 
-                heroActions(event: event)
-            }
-            .padding(Tokens.heroPadding)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .background(Tokens.accentWashSoft)
-    }
-
-    private func heroCenterStack(
-        event: CalendarEvent,
-        data: (people: [AvatarPerson], total: Int)
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 9) {
-                Text(event.title)
-                    .font(Tokens.heroTitle)
-                    .lineLimit(1)
-
-                if !data.people.isEmpty {
-                    Text(
-                        data.people.prefix(3)
-                            .map(\.displayName)
-                            .joined(separator: ", ")
-                    )
-                    .font(Tokens.metaText)
-                    .foregroundStyle(.inkSecondary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                }
-            }
-
-            HStack(spacing: 9) {
                 Text(viewModel.tickTimeText(for: event))
-                    .font(.monoMetaMedium)
-                    .foregroundStyle(.sage)
-
-                Text(HomeSharedViews.formattedTime(event.start))
                     .font(.monoMeta)
                     .foregroundStyle(.inkSecondary)
-
-                if let platform = event.conferencePlatform {
-                    MeetingPlatformChip(platform: platform)
-                }
-            }
-
-            if let notes = event.notes, !notes.isEmpty {
-                Text(notes)
-                    .font(Tokens.metaText)
-                    .foregroundStyle(.inkSecondary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .padding(.top, 2)
-            }
-        }
-    }
-
-    private func heroActions(event: CalendarEvent) -> some View {
-        VStack(spacing: 9) {
-            Button {
-                Task { await viewModel.joinAndRecord(event) }
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "record.circle")
-                    Text(
-                        viewModel.heroIsRecordOnly
-                            ? "Record"
-                            : "Join & Record"
-                    )
-                }
-            }
-            .buttonStyle(JoinRecordButtonStyle())
-            .disabled(viewModel.recordDisabled)
-
-            Button {
-                viewModel.openInCalendar(event)
-            } label: {
-                Text("View in calendar")
-                    .font(Tokens.metaText)
-                    .foregroundStyle(.sage)
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.leading, 16)
-    }
-
-    // MARK: - Ordinary upcoming row
-
-    private func ordinaryUpcomingRow(
-        event: CalendarEvent
-    ) -> some View {
-        let data = viewModel.avatarData(for: event)
-
-        return Button {
-            viewModel.selectEvent(event.id)
-        } label: {
-            HStack(alignment: .center, spacing: 0) {
-                AvatarCluster(
-                    people: data.people,
-                    totalCount: data.total,
-                    size: Tokens.avatarSize
-                )
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(event.title)
-                        .font(Tokens.rowTitle)
-                        .lineLimit(1)
-
-                    HStack(spacing: 9) {
-                        Text(viewModel.tickTimeText(for: event))
-                            .font(.monoMetaMedium)
-                            .foregroundStyle(.sage)
-
-                        Text(HomeSharedViews.formattedTime(event.start))
-                            .font(.monoMeta)
-                            .foregroundStyle(.inkSecondary)
-
-                        if let platform = event.conferencePlatform {
-                            MeetingPlatformChip(platform: platform)
-                        }
-                    }
-                }
-
-                Spacer(minLength: 8)
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .medium))
@@ -300,115 +193,61 @@ private struct HomeUpcomingSection: View {
     }
 }
 
-// MARK: - Past Meetings section (extracted to stay under type-body-length limit)
+// MARK: - Recent meetings section (tiles)
 
-private struct HomePastSection: View {
+private struct HomeRecentSection: View {
     let viewModel: HomeViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HomeSharedViews.groupLabel("Past meetings")
-                .padding(.bottom, Tokens.groupToCardGap)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Recent meetings")
+                    .font(.sectionTitle)
+                    .foregroundStyle(.ink)
+
+                Spacer(minLength: 8)
+
+                if !viewModel.showNoRecent {
+                    Button {
+                        viewModel.showMeetings()
+                    } label: {
+                        Text("See all (\(viewModel.pastMeetingsCount))")
+                            .font(.system(size: 13))
+                            .foregroundStyle(.sage)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
 
             if viewModel.showNoRecent {
-                noRecordingsCard
-            } else {
-                pastCard
-            }
-        }
-    }
-
-    private var noRecordingsCard: some View {
-        Text("No recordings yet")
-            .font(Tokens.metaText)
-            .foregroundStyle(.inkSecondary)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, Tokens.spacingLG)
-            .homeCard()
-    }
-
-    private var pastCard: some View {
-        VStack(spacing: 0) {
-            ForEach(
-                Array(viewModel.recentMeetings.enumerated()),
-                id: \.element.id
-            ) { index, meeting in
-                if index > 0 {
-                    InsetDivider()
-                }
-                pastRow(meeting: meeting)
-            }
-
-            InsetDivider()
-            seeAllRow
-        }
-        .homeCard()
-    }
-
-    private var seeAllRow: some View {
-        Button {
-            viewModel.showMeetings()
-        } label: {
-            HStack(alignment: .center, spacing: 0) {
-                Text("See All")
-                    .font(Tokens.rowTitle)
-
-                Spacer(minLength: 8)
-
-                Text("\(viewModel.pastMeetingsCount)")
-                    .foregroundStyle(.inkSecondary)
+                Text("No recordings yet")
                     .font(Tokens.metaText)
-                    .padding(.trailing, 6)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.inkTertiary)
-            }
-            .padding(.vertical, Tokens.rowVerticalPadding)
-            .padding(.horizontal, Tokens.rowHorizontalPadding)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func pastRow(
-        meeting: MeetingSummary
-    ) -> some View {
-        let data = viewModel.avatarData(for: meeting)
-
-        return Button {
-            viewModel.selectMeeting(meeting.id)
-        } label: {
-            HStack(alignment: .center, spacing: 0) {
-                AvatarCluster(
-                    people: data.people,
-                    totalCount: data.total,
-                    size: Tokens.avatarSize,
-                    showLeadingRecordingAvatar: true
-                )
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(meeting.title)
-                        .font(Tokens.rowTitle)
-                        .lineLimit(1)
-
-                    Text(viewModel.pastSecondLine(for: meeting))
-                        .font(.monoMeta)
-                        .foregroundStyle(.inkSecondary)
-                        .lineLimit(1)
+                    .foregroundStyle(.inkSecondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Tokens.spacingLG)
+                    .homeCard()
+            } else {
+                HStack(alignment: .top, spacing: 10) {
+                    ForEach(viewModel.recentMeetings) { meeting in
+                        MeetingTile(
+                            title: meeting.title,
+                            meta: TimeFormatting.meetingSecondLine(
+                                date: meeting.date,
+                                duration: meeting.recordingDuration
+                            ),
+                            colorHex: meeting.calendarColorHex,
+                            systemImage: meeting.hasTranscript ? "waveform" : "mic"
+                        ) {
+                            viewModel.selectMeeting(meeting.id)
+                        }
+                    }
+                    // Keep tiles a third of the row wide even with fewer meetings.
+                    ForEach(0 ..< max(0, 3 - viewModel.recentMeetings.count), id: \.self) { _ in
+                        Color.clear.frame(maxWidth: .infinity, maxHeight: 1)
+                    }
                 }
-
-                Spacer(minLength: 8)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.inkTertiary)
             }
-            .padding(.vertical, Tokens.rowVerticalPadding)
-            .padding(.horizontal, Tokens.rowHorizontalPadding)
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
     }
 }
 
@@ -416,13 +255,6 @@ private struct HomePastSection: View {
 
 /// Shared view helpers used by the extracted section structs.
 private enum HomeSharedViews {
-    static func groupLabel(_ title: String) -> some View {
-        Text(title)
-            .font(.monoKicker)
-            .foregroundStyle(.inkSecondary)
-            .padding(.leading, 4)
-    }
-
     /// Formats an event start time as e.g. "9:00 AM".
     static func formattedTime(_ date: Date) -> String {
         timeFormatter.string(from: date)
